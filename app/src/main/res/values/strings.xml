@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">BullyAlert</string>
+
+    <!-- Strings related to login and register -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_phone">Phone</string>
+    <string name="action_sign_in">Sign in </string>
+    <string name="action_register">Register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_register_short">Register</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_phone">Invalid Phone Number</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="welcome">Welcome to BullyAlert!</string>
+    <string name="copyright">Copyright\u00a9 University of Colorado Boulder</string>
+    <string name="cybersafety">BullyAlert</string>
+    <string name="my_email">email id</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="add_new_profile">Add New Profile</string>
+    <string name="check_notification">Check Notifications</string>
+    <string name="settings">Settings</string>
+    <string name="monitoring_profiles">Monitoring Profiles</string>
+    <string name="history">History</string>
+
+    <string name="social">Social Network: </string>
+    <string name="username">Username: </string>
+    <string name="search">Search</string>
+    <string name="monitor">Monitor</string>
+    <string name="name">Name</string>
+    <string name="profile">Profile</string>
+    <string name="Level">Level</string>
+    <string name="save">Save</string>
+
+    <string name="right">Right</string>
+    <string name="wrong">Wrong</string>
+    <string name="see_context">See Context</string>
+
+    <item name="followedby" type="id"/>
+
+    <string-array name="social_array">
+        <item>Instagram</item>
+    </string-array>
+    <string name="title_activity_register">RegisterActivity</string>
+</resources>

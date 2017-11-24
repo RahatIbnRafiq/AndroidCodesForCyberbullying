@@ -88,7 +88,7 @@ public class NavigationActivity extends AppCompatActivity
         {
             showLoginDialog();
         }
-        else if (intent.hasExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS))
+        if (intent.hasExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS))
         {
             HashMap<String,Notification> mNotifications;
             mNotifications = (HashMap<String,Notification>)intent.getSerializableExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS);
@@ -112,6 +112,7 @@ public class NavigationActivity extends AppCompatActivity
 
     private void showLoginDialog()
     {
+        UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
         Fragment fragment = NotificationFragment.newInstance(null);
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("instagram credentials");
@@ -171,21 +172,27 @@ public class NavigationActivity extends AppCompatActivity
         } else if (id == R.id.check_notifications) {
             toolbar.setTitle(R.string.check_notification);
             fragment = NotificationFragment.newInstance(null);
-        } else if (id == R.id.settings) {
+        } /*else if (id == R.id.settings) {
             toolbar.setTitle(R.string.settings);
             fragment = SettingFragment.newInstance(1);
-        } else if (id == R.id.monitoring_profiles) {
+        }*/ else if (id == R.id.monitoring_profiles) {
             toolbar.setTitle(R.string.monitoring_profiles);
             fragment = ProfileFragment.newInstance(1);
-        } else if (id == R.id.history) {
+        } /*else if (id == R.id.history) {
             toolbar.setTitle(R.string.history);
             fragment = HistoryFragment.newInstance(1);
-        } else if (id == R.id.logout)
+        }*/ else if (id == R.id.logout)
         {
             UtilityVariables.IS_ALARM_ON = false;
-            if(mAlarmManager != null)
+            //mPendingNotificationIntent = PendingIntent.getService(this, 1, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if(this.mAlarmManager != null)
             {
-                mAlarmManager.cancel(mPendingNotificationIntent);
+                Log.i(UtilityVariables.tag,"alarm manager isnt null");
+                this.mAlarmManager.cancel(mPendingNotificationIntent);
+            }
+            else
+            {
+                Log.i(UtilityVariables.tag,"alarm manager is null");
             }
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
@@ -227,8 +234,8 @@ public class NavigationActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(History.Item item) {
-        Fragment fragment = HistoryDetailFragment.newInstance(item.name);
+    public void onListFragmentInteraction(History item) {
+        Fragment fragment = HistoryDetailFragment.newInstance(item);
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)

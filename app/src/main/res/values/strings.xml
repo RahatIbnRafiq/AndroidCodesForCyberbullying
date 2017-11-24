@@ -3,8 +3,10 @@
 
     <!-- Strings related to login and register -->
     <string name="prompt_email">Email</string>
+    <string name="prompt_email_confirm">Retype Email</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_password_confirm">Retype Password</string>
     <string name="prompt_phone">Phone</string>
     <string name="action_sign_in">Sign in </string>
     <string name="action_register">Register</string>
@@ -15,6 +17,8 @@
     <string name="error_invalid_phone">Invalid Phone Number</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_field_email_matching">Emails do not match</string>
+    <string name="error_field_password_matching">Passwords do not match</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
@@ -42,12 +46,50 @@
     <string name="profile">Profile</string>
     <string name="Level">Level</string>
     <string name="save">Save</string>
+    <string name="age_group">Your Age(optional)</string>
+    <string name="ethnicity">Your Ethnicity(optional)</string>
+    <string name="gender">Gender(optional)</string>
 
     <string name="right">Right</string>
     <string name="wrong">Wrong</string>
     <string name="see_context">See Context</string>
 
     <item name="followedby" type="id"/>
+
+
+    <string-array name="ethnicity_array">
+        <item>Decline</item>
+        <item>White</item>
+        <item>Hispanic</item>
+        <item>Native American</item>
+        <item>Pacific Islander</item>
+        <item>African American</item>
+        <item>Asian</item>
+        <item>Other</item>
+
+    </string-array>
+
+    <string-array name="gender_array">
+        <item>Decline</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+
+    </string-array>
+
+
+    <string-array name="age_group_array">
+        <item>Decline</item>
+        <item>15-25</item>
+        <item>26-35</item>
+        <item>36-45</item>
+        <item>46-55</item>
+        <item>56-65</item>
+        <item>66-75</item>
+        <item>76-85</item>
+        <item>86-100</item>
+
+    </string-array>
 
     <string-array name="social_array">
         <item>Instagram</item>

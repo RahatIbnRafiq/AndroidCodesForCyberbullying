@@ -17,6 +17,7 @@ import java.util.Map;
 public class Notification implements Serializable
 {
     public String mPostId;
+    public String mNotificationId;
     public String mUserId;
     public String mUserName;
     public ArrayList<Comment> mNewComments;
@@ -29,6 +30,15 @@ public class Notification implements Serializable
 
     public Notification()
     {
+    }
+
+
+    public String getmNotificationId() {
+        return mNotificationId;
+    }
+
+    public int getmFeedBack() {
+        return mFeedBack;
     }
 
     public void setmOldComments(ArrayList<Comment> mOldComments) {
@@ -85,5 +95,13 @@ public class Notification implements Serializable
 
     public double getmLevel() {
         return mLevel;
+    }
+
+    public void setmNotificationId(String mNotificationId) {
+        this.mNotificationId = mNotificationId;
+    }
+
+    public void setmFeedBack(int mFeedBack) {
+        this.mFeedBack = mFeedBack;
     }
 }

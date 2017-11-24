@@ -1,5 +1,6 @@
 package com.bamboo.bullyalert.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,71 +12,40 @@ import java.util.Map;
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class History {
+public class History implements Serializable
+{
 
-    /**
-     * An array of sample (dummy) items.
-     */
-    public static final List<Item> ITEMS = new ArrayList<Item>();
+    public String mUsername;
+    public String mOsnName;
+    public int mBullyingCount;
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    public static final Map<String, Item> ITEM_MAP = new HashMap<String, Item>();
-
-    private static final int COUNT = 2;
-
-    static {
-        // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createItem(i));
-        }
+    public History(String mUsername, String mOsnName, int mBullyingCount) {
+        this.mUsername = mUsername;
+        this.mOsnName = mOsnName;
+        this.mBullyingCount = mBullyingCount;
     }
 
-    private static void addItem(Item item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.name, item);
+    public String getmUsername() {
+        return mUsername;
     }
 
-    private static Item createItem(int position) {
-        Item item;
-        switch (position) {
-            case 1:
-                item = new Item("John Doe", "Instagram", "" + 2);
-                break;
-            case 2:
-                item = new Item("John Doe Senior", "Instagram", "" + 5);
-                break;
-            default:
-                item = null;
-                break;
-        }
-        return item;
+    public String getmOsnName() {
+        return mOsnName;
     }
 
-    private static String makeDetails(int position) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Details about Item: ").append(position);
-        return builder.toString();
+    public int getmBullyingCount() {
+        return mBullyingCount;
     }
 
-    /**
-     * A dummy item representing a piece of content.
-     */
-    public static class Item {
-        public final String name;
-        public final String type;
-        public final String count;
+    public void setmUsername(String mUsername) {
+        this.mUsername = mUsername;
+    }
 
-        public Item(String name, String type, String count) {
-            this.name = name;
-            this.type = type;
-            this.count = count;
-        }
+    public void setmOsnName(String mOsnName) {
+        this.mOsnName = mOsnName;
+    }
 
-        @Override
-        public String toString() {
-            return name;
-        }
+    public void setmBullyingCount(int mBullyingCount) {
+        this.mBullyingCount = mBullyingCount;
     }
 }

@@ -339,6 +339,7 @@ public class AddUserFragment extends Fragment implements LoginDialogFragment.Log
         if(this.mSocialNetworkName.equals("Instagram"))
         {
             String urlString = UtilityVariables.INSTAGRAM_API_USER_SEARCH+username+"&access_token="+authenticationToken;
+            Log.i(UtilityVariables.tag,urlString);
             StringRequest stringRequest = new StringRequest(Request.Method.GET,
                     urlString,
                     new Response.Listener<String>() {
@@ -429,7 +430,7 @@ public class AddUserFragment extends Fragment implements LoginDialogFragment.Log
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
                 mMessage = resultjson.optString("message");
                 String success = resultjson.optString("success");
-                if(success.equals("succeess"))
+                if(success.equals("success"))
                     return true;
                 return false;
 
@@ -462,6 +463,7 @@ public class AddUserFragment extends Fragment implements LoginDialogFragment.Log
 
             if (success)
             {
+                Log.i(UtilityVariables.tag,"hello inside add user fragment, user was inserted into the db in the server.");
                 Intent intent = new Intent(mContext, NavigationActivity.class);
                 startActivity(intent);
             }

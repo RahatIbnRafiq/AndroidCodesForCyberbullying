@@ -3,6 +3,7 @@ package com.bamboo.bullyalert.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -38,23 +39,29 @@ class   CustomComparator implements Comparator<Notification> {
 public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNotificationRecyclerViewAdapter.ViewHolder> {
     private final OnListFragmentInteractionListener mListener;
 
-    private final HashMap<String,Notification> mNotifications;
+    //private final HashMap<String,Notification> mNotifications;
     private final ArrayList<Notification> mNotificationList;
 
-    public MyNotificationRecyclerViewAdapter(HashMap<String,Notification> notifications, OnListFragmentInteractionListener listener)
+    public MyNotificationRecyclerViewAdapter(ArrayList<Notification> notifications, OnListFragmentInteractionListener listener)
     {
-        this.mNotificationList = new ArrayList<>();
+        //this.mNotificationList = new ArrayList<>();
         this.mListener = listener;
-        this.mNotifications = notifications;
-        Log.i(UtilityVariables.tag,"inside MyNotificationRecyclerViewAdapter constructor: size of notifications: "+mNotifications.size());
+        this.mNotificationList = notifications;
+        /*Log.i(UtilityVariables.tag,"inside MyNotificationRecyclerViewAdapter constructor: size of notifications: "+mNotifications.size());
         for (Map.Entry<String, Notification> entry : mNotifications.entrySet())
         {
             String postid = entry.getKey();
             Notification n = entry.getValue();
             mNotificationList.add(n);
-        }
+        }*/
         Collections.sort(mNotificationList, new CustomComparator());
 
+    }
+
+    public void deleteItem(int position)
+    {
+        this.mNotificationList.remove(position);
+        this.notifyItemRemoved(position);
     }
 
     @Override
@@ -94,6 +101,13 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
                         mListener.onListFragmentInteraction(notif);
 
                     }
+                }
+            });
+
+            holder.mView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
+                @Override
+                public boolean onGenericMotion(View v, MotionEvent event) {
+                    return false;
                 }
             });
 

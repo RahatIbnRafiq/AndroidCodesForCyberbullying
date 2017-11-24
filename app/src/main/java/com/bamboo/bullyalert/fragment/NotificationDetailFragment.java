@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bamboo.bullyalert.Database.NotificationFeedback;
+import com.bamboo.bullyalert.Database.NotificationFeedbackDAO;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.adapter.MyNotificationDetailRecyclerViewAdapter;
@@ -48,6 +50,9 @@ public class NotificationDetailFragment extends Fragment {
     private Button mButtonRight;
     private Button mButtonWrong;
 
+
+    private NotificationFeedbackDAO mNotificationFeedbackDao;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -72,9 +77,9 @@ public class NotificationDetailFragment extends Fragment {
 
         if (getArguments() != null) {
             mNotification= (Notification)getArguments().getSerializable(ARG_NAME);
-            Log.i(UtilityVariables.tag,"bundle arguments found inside notification detail fragment");
-            Log.i(UtilityVariables.tag," notification post id"+ mNotification.getmPostId());
-            Log.i(UtilityVariables.tag," notification username"+ mNotification.getmUserName());
+            //Log.i(UtilityVariables.tag,"bundle arguments found inside notification detail fragment");
+            //Log.i(UtilityVariables.tag," notification post id"+ mNotification.getmPostId());
+            //Log.i(UtilityVariables.tag," notification username"+ mNotification.getmUserName());
         }
     }
 
@@ -87,6 +92,8 @@ public class NotificationDetailFragment extends Fragment {
         //nameTextView.setText(mName);
 
         this.mContext = view.getContext();
+
+        this.mNotificationFeedbackDao = new NotificationFeedbackDAO(mContext);
 
         // Set the adapter
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
@@ -115,14 +122,35 @@ public class NotificationDetailFragment extends Fragment {
             }
         });
 
-        mButtonRight.setOnClickListener(new View.OnClickListener()
+        if(mNotification.getmFeedBack() != -1)
         {
-            @Override
-            public void onClick(View v)
+            mButtonWrong.setEnabled(false);
+            mButtonRight.setEnabled(false);
+        }
+        else
+        {
+            mButtonRight.setOnClickListener(new View.OnClickListener()
             {
+                @Override
+                public void onClick(View v)
+                {
+                    if(mNotification.getmFeedBack() == -1)
+                        getFeedback(1);
+                }
+            });
 
-            }
-        });
+            mButtonWrong.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if(mNotification.getmFeedBack() == -1)
+                        getFeedback(0);
+                }
+            });
+        }
+
+
 
 
 
@@ -130,9 +158,23 @@ public class NotificationDetailFragment extends Fragment {
     }
 
 
-    private void getFeedback(int feedback)
+    private void getFeedback(int feedbackValue)
     {
-        mNotification.mFeedBack = feedback;
+        mNotification.mFeedBack = feedbackValue;
+        String comments = "";
+        for(int i=0; i< mNotification.getmNewComments().size();i++)
+        {
+            comments = comments + mNotification.getmNewComments().get(i)+"--->";
+        }
+        String feedback = feedbackValue+"";
+        String predicted = mNotification.getmLevel()+"";
+        String notificationId = mNotification.getmNotificationId();
+        Log.i(UtilityVariables.tag,"notification id is :"+notificationId);
+        NotificationFeedback notificationFeedback = new NotificationFeedback(UtilityVariables.USER_EMAIL,
+                notificationId,comments,predicted,feedback);
+        long s = mNotificationFeedbackDao.insertUser(notificationFeedback);
+        Log.i(UtilityVariables.tag, "inserted feedback: "+s);
+
     }
     private void populateNotificationDetails()
     {

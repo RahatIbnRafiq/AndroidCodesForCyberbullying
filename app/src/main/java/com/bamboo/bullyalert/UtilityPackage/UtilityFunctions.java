@@ -92,10 +92,11 @@ public class UtilityFunctions {
             urlConnection.setRequestMethod(UtilityVariables.GET_REQUEST_METHOD);
             urlConnection.setReadTimeout(UtilityVariables.READ_TIMEOUT);
             urlConnection.setConnectTimeout(UtilityVariables.CONNECTION_TIMEOUT);
-
-
-            InputStream inputStream ;
+            if(urlConnection.getResponseCode() != 200)
+                return null;
+            InputStream inputStream =null;
             inputStream = new BufferedInputStream(urlConnection.getInputStream());
+
             String response = UtilityFunctions.streamToString(inputStream);
             JSONObject resultjson = new JSONObject(response);
             return resultjson;
@@ -116,36 +117,46 @@ public class UtilityFunctions {
 
 
 
-    public static String streamToString(InputStream is) throws IOException {
-        String str = "";
+    public static String streamToString(InputStream is) {
 
-        if (is != null) {
-            StringBuilder sb = new StringBuilder();
-            String line;
+        try {
+            String str = "";
 
-            try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
+            if (is != null) {
+                StringBuilder sb = new StringBuilder();
+                String line;
 
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
+                try {
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(is));
+
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    reader.close();
+                }
+                finally {
+                    try{
+                        is.close();
+                    }catch (IOException ex)
+                    {
+                        Log.i(UtilityVariables.tag,"IO Exception in streamToString function: "+ex.toString());
+                    }
+
                 }
 
-                reader.close();
+                str = sb.toString();
             }
-            finally {
-                try{
-                    is.close();
-                }catch (IOException ex)
-                {
-                    Log.i(UtilityVariables.tag,"IO Exception in streamToString function: "+ex.toString());
-                }
+            //Log.i(UtilityVariables.tag,"return string: "+str);
+            return str;
 
-            }
-
-            str = sb.toString();
+        }catch (Exception e)
+        {
+            Log.i(UtilityVariables.tag,"Exception in streamToString "+e.toString());
         }
-        //Log.i(UtilityVariables.tag,"return string: "+str);
-        return str;
+
+        return null;
+
     }
 }

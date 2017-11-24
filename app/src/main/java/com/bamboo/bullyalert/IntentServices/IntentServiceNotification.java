@@ -20,6 +20,8 @@ import com.android.volley.toolbox.Volley;
 import com.bamboo.bullyalert.Classifier.Classifier;
 import com.bamboo.bullyalert.Database.MonitoringPost;
 import com.bamboo.bullyalert.Database.MonitoringPostDAO;
+import com.bamboo.bullyalert.Database.NotificationFeedback;
+import com.bamboo.bullyalert.Database.NotificationFeedbackDAO;
 import com.bamboo.bullyalert.Database.User;
 import com.bamboo.bullyalert.Database.UserDAO;
 import com.bamboo.bullyalert.NavigationActivity;
@@ -68,6 +70,7 @@ public class IntentServiceNotification extends IntentService
 
     private MonitoringPostDAO mMonitoringPostDao;
     private UserDAO mUserDao;
+    private NotificationFeedbackDAO mNotificationFeedbackDao;
 
     public IntentServiceNotification()
     {
@@ -79,14 +82,24 @@ public class IntentServiceNotification extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
+        if(UtilityVariables.IS_ALARM_ON == false)
+        {
+            Log.i(UtilityVariables.tag,"Alarm is set to false. exiting intent service");
+            return;
+        }
         Log.i(UtilityVariables.tag,"inside intent service now.");
         try
         {
             this.mMonitoringUserIds = new ArrayList<>();
             mPostsFromDB = new HashMap<>();
             mPostsFromAPI = new HashMap<>();
+
+
             mMonitoringPostDao = new MonitoringPostDAO(getApplicationContext());
+            mNotificationFeedbackDao = new NotificationFeedbackDAO(getApplicationContext());
             mUserDao = new UserDAO(getApplicationContext());
+
+
             mNewCommentsForPost = new HashMap<>();
             mOldCommentsForPost = new HashMap<>();
             mNotifications = new HashMap<>();
@@ -145,6 +158,7 @@ public class IntentServiceNotification extends IntentService
 
     public void getAllPostsFromDatabase()
     {
+        UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_GETTING_POSTS;
         mPostsFromDB = mMonitoringPostDao.fetchAllMonitoringPostsByEmail(UtilityVariables.USER_EMAIL);
         for (Map.Entry<String, MonitoringPost> entry : mPostsFromDB.entrySet())
         {
@@ -163,6 +177,8 @@ public class IntentServiceNotification extends IntentService
                     "/media/recent/?access_token="+UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN;
 
             JSONObject jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
+            if(jsonObject == null)
+                return;
             //Log.i(UtilityVariables.tag,"json string after post get request:"+jsonObject.toString());
             JSONArray userdata = jsonObject.optJSONArray("data");
             for(int j=0;j<userdata.length();j++)
@@ -207,6 +223,7 @@ public class IntentServiceNotification extends IntentService
 
     public void getCommentsForPosts()
     {
+        UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_GETTING_COMMENTS;
         for (Map.Entry<String, MonitoringPost> entry : mPostsFromDB.entrySet())
         {
 
@@ -278,6 +295,7 @@ public class IntentServiceNotification extends IntentService
 
     public void classifyPosts()
     {
+        UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_CLASSIFYING;
         Log.i(UtilityVariables.tag," inside the classify posts function. total posts for whcih new comments were found:"+mNewCommentsForPost.size());
         Log.i(UtilityVariables.tag,"___________________________________");
         for (Map.Entry<String, ArrayList<Comment>> entry : mNewCommentsForPost.entrySet())
@@ -425,6 +443,7 @@ public class IntentServiceNotification extends IntentService
 
             //System.out.println(sdf.format(new Date(lastCommentTime)).toString());
             Date date = new Date(lastCommentTime);
+            notification.setmNotificationId(notificationId);
 
             try
             {
@@ -462,6 +481,57 @@ public class IntentServiceNotification extends IntentService
     }
 
 
+    private void updateClassifier()
+    {
+        try
+        {
+            ArrayList<NotificationFeedback> feedbacks = mNotificationFeedbackDao.fetchAllFeedbackByEmail(UtilityVariables.USER_EMAIL);
+            if(feedbacks.size() > 0)
+            {
+                this.mClassifier.updateClassifier(feedbacks);
+                for(int i=0; i< feedbacks.size();i++)
+                {
+                    try {
+
+                        JSONObject data = new JSONObject();
+                        data.put("notificationid",feedbacks.get(i).getmNotificationId());
+                        data.put("email",UtilityVariables.USER_EMAIL);
+                        data.put("predicted",feedbacks.get(i).getmPredicted());
+                        data.put("feedback",feedbacks.get(i).getmFeedback());
+
+                        String urlString = UtilityVariables.ADD_NOTIFICATION_FEEDBACK;
+                        JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
+
+                        if (resultjson.optString("success").toString().equals("success"))
+                        {
+                            Log.i(UtilityVariables.tag,"adding feedback success: "+this.getClass().getName());
+                            long s =mNotificationFeedbackDao.deleteFeedback(UtilityVariables.USER_EMAIL,feedbacks.get(i).getmNotificationId());
+                            Log.i(UtilityVariables.tag, "feedback was deleted: "+s);
+                        }
+                        else
+                        {
+                            Log.i(UtilityVariables.tag,"adding feedback failed: "+this.getClass().getName());
+                        }
+
+                    }catch (Exception e)
+                    {
+                        Log.i(UtilityVariables.tag,"Exception in updateClassifier function sending data to server : "+e.toString());
+                    }
+                }
+
+            }
+            else
+            {
+                Log.i(UtilityVariables.tag, "No feedbacks found!");
+            }
+        }catch (Exception e)
+        {
+            Log.i(UtilityVariables.tag, "Exception in updating classifier function in IntentServiceNotification: "+e.toString());
+        }
+
+    }
+
+
 
 
     public void checkInstagramNotification()
@@ -471,6 +541,7 @@ public class IntentServiceNotification extends IntentService
             Log.i(UtilityVariables.tag, "checkInstagramNotification function ");
             if (UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN != null || getTokenFromDatabase() != null)
             {
+                updateClassifier();
                 getAllMonitoringUsers();
                 getAllPostsFromDatabase();
                 getRecentNewPostsForUsers();
@@ -483,6 +554,7 @@ public class IntentServiceNotification extends IntentService
                         "On Instagram!!"+this.mInstagramBullyingInstance+" instances",
                         "Possible Bullying!");
                 updateMonitoringPostTable();
+                UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
 
             }
             else

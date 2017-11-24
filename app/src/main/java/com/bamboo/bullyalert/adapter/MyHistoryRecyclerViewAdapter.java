@@ -1,29 +1,31 @@
 package com.bamboo.bullyalert.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bamboo.bullyalert.R;
+import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.fragment.HistoryFragment.OnListFragmentInteractionListener;
 import com.bamboo.bullyalert.model.History;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link History.Item} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {History} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class MyHistoryRecyclerViewAdapter extends RecyclerView.Adapter<MyHistoryRecyclerViewAdapter.ViewHolder> {
 
-    private final List<History.Item> mValues;
+    private final List<History> mHistory;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyHistoryRecyclerViewAdapter(List<History.Item> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public MyHistoryRecyclerViewAdapter(List<History> history, OnListFragmentInteractionListener listener) {
+        Log.i(UtilityVariables.tag,"inside history adapter");
+        mHistory = history;
         mListener = listener;
     }
 
@@ -35,11 +37,15 @@ public class MyHistoryRecyclerViewAdapter extends RecyclerView.Adapter<MyHistory
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mNameView.setText(mValues.get(position).name);
-        holder.mTypeView.setText(mValues.get(position).type);
-        holder.mCountView.setText(mValues.get(position).count);
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        Log.i(UtilityVariables.tag,"hello in recyclerview history adapter "+mHistory.get(position).getmUsername());
+        holder.mTextViewUserName.setText(mHistory.get(position).getmUsername());
+        holder.mTextViewSocialNetwork.setText(mHistory.get(position).getmOsnName());
+        holder.mTextViewBullyingCount.setText(mHistory.get(position).getmBullyingCount()+"");
+        //holder.mItem = mValues.get(position);
+        //holder.mTextViewUserName.setText(mHistory.get(position).getmUsername());
+        //holder.mTextViewSocialNetwork.setText(mHistory.get(position).getmOsnName());
+        //holder.mBullyingCount.setText(mHistory.get(position).getmBullyingCount());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,7 +53,7 @@ public class MyHistoryRecyclerViewAdapter extends RecyclerView.Adapter<MyHistory
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    //mListener.onListFragmentInteraction(mHistory.get(position));
                 }
             }
         });
@@ -55,27 +61,21 @@ public class MyHistoryRecyclerViewAdapter extends RecyclerView.Adapter<MyHistory
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mHistory.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView mTextViewUserName;
+        public TextView mTextViewSocialNetwork;
+        public TextView mTextViewBullyingCount;
         public final View mView;
-        public final TextView mNameView;
-        public final TextView mTypeView;
-        public final TextView mCountView;
-        public History.Item mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mNameView = (TextView) view.findViewById(R.id.name);
-            mTypeView = (TextView) view.findViewById(R.id.type);
-            mCountView = (TextView) view.findViewById(R.id.count);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mCountView.getText() + "'";
+            mTextViewUserName = (TextView) view.findViewById(R.id.history_name);
+            mTextViewSocialNetwork = (TextView) view.findViewById(R.id.history_type);
+            mTextViewBullyingCount = (TextView) view.findViewById(R.id.history_count);
         }
     }
 }

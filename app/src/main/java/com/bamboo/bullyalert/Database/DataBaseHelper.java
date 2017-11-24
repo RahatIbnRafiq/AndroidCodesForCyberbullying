@@ -35,11 +35,15 @@ public class DataBaseHelper extends SQLiteOpenHelper
     public static final String FEEDBACK_TABLE_COLUMN_EMAIL = "EMAIL";
     public static final String FEEDBACK_TABLE_COLUMN_NOTIFICATION_ID = "NOTIFICATION_ID";
     public static final String FEEDBACK_TABLE_COLUMN_COMMENTS = "COMMENTS";
+    public static final String FEEDBACK_TABLE_COLUMN_PREDICTED = "PREDICTED";
+    public static final String FEEDBACK_TABLE_COLUMN_FEEDBACK = "FEEDBACK";
     public static final String CREATE_FEEDBACK_TABLE = "CREATE TABLE IF NOT EXISTS "
             + FEEDBACK_TABLE
             + "("
             + FEEDBACK_TABLE_COLUMN_NOTIFICATION_ID + " TEXT PRIMARY KEY, "
             + FEEDBACK_TABLE_COLUMN_COMMENTS + " TEXT NOT NULL, "
+            + FEEDBACK_TABLE_COLUMN_PREDICTED + " TEXT NOT NULL, "
+            + FEEDBACK_TABLE_COLUMN_FEEDBACK + " TEXT NOT NULL, "
             + FEEDBACK_TABLE_COLUMN_EMAIL + " TEXT NOT NULL"
             + ")";
 

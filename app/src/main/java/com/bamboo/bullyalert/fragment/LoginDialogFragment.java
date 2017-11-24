@@ -39,6 +39,7 @@ public class LoginDialogFragment extends DialogFragment {
     private Button mButton;
     private WebView webView;
     private String instagramAuthCode = null;
+    Context mContext;
 
     public LoginDialogFragment()
     {
@@ -57,13 +58,13 @@ public class LoginDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login_dialog, container, false);
-        Context context = view.getContext();
+        mContext = view.getContext();
 
         String title = getArguments().getString("title").toLowerCase();
         if(title.contains("instagram"))
         {
             Log.i(UtilityVariables.tag,"onCreateView: trying to initialize instagram login dialog");
-            InstagramLoginDialog(view,context);
+            InstagramLoginDialog(view,mContext);
         }
         else
         {

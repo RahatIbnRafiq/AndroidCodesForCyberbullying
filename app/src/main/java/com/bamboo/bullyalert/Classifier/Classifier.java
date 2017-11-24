@@ -8,6 +8,7 @@ package com.bamboo.bullyalert.Classifier;
 import android.content.Context;
 import android.util.Log;
 
+import com.bamboo.bullyalert.Database.NotificationFeedback;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.model.Comment;
@@ -21,8 +22,9 @@ import java.util.StringTokenizer;
 
 
 public class Classifier {
-    private static final int EPOCH = 50;
-    private static final double LEARNING_RATE = 0.1;
+    private static final int EPOCH = 1000;
+    private static final double LEARNING_RATE = 0.001;
+    private static final int BOOTSTRAP_VARIABLE = 5;
 
     private static Classifier instance = null;
     private static ArrayList<String> negativeWordList;
@@ -163,6 +165,66 @@ public class Classifier {
                     Log.i(UtilityVariables.tag,"IO Exception in Classifier class load training data function.");
                 }
             }
+        }
+    }
+
+
+    public void updateClassifier(ArrayList<NotificationFeedback> feedbacks)
+    {
+        try
+        {
+            ClassifierTrainingData tr = new ClassifierTrainingData();
+            for(int i=0; i< feedbacks.size();i++)
+            {
+                NotificationFeedback feedback = feedbacks.get(i);
+                String[]comments = feedback.getmComments().split("--->");
+                ArrayList<Comment> commentList = new ArrayList<>();
+                for(int j = 0; j< comments.length ; j++)
+                {
+                    commentList.add(new Comment(comments[j],"",0));
+                }
+
+                double[]featureValues = this.getFeatureValues(commentList);
+                tr.featurevalues = featureValues;
+                int f = Integer.parseInt(feedback.mFeedback);
+                double p = Double.parseDouble(feedback.getmPredicted());
+                if(f == 0 && p < 0.5)
+                    tr.truePrediction = 1.0;
+                else if(f == 0 && p > 0.5)
+                    tr.truePrediction = 0.0;
+                else if(f == 1 && p > 0.5)
+                    tr.truePrediction = 1.0;
+                else
+                    tr.truePrediction = 0.0;
+                for(int j=0; j< BOOTSTRAP_VARIABLE;j++)
+                    this.trainingDataList.add(tr);
+            }
+
+            for(int epoch=0;epoch<Classifier.EPOCH;epoch++)
+            {
+                double sum_error = 0.0;
+                for(int j=0;j<this.trainingDataList.size();j++)
+                {
+                    tr = this.trainingDataList.get(j);
+                    double yhat = this.predict(tr.featurevalues);
+                    double error = tr.truePrediction - yhat;
+                    sum_error += error*error;
+                    for(int i=0;i<tr.featurevalues.length;i++)
+                    {
+                        this.coefficients[i] = this.coefficients[i]*Classifier.LEARNING_RATE*error*tr.featurevalues[i]*yhat*(1.0-yhat);
+                    }
+
+                }
+                //Log.i(UtilityVariables.tag,"Updating classifier: epoch: "+epoch+" sum error: "+sum_error);
+
+            }
+
+
+
+
+        }catch (Exception e)
+        {
+            Log.i(UtilityVariables.tag,"Exception: "+this.getClass().getName()+" updateClassifier function: "+e.toString());
         }
     }
 

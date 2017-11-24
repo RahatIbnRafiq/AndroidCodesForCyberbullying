@@ -25,10 +25,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +63,17 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
     // UI references.
     private AutoCompleteTextView mEmailView;
+    private AutoCompleteTextView mEmailConfirmView;
     private EditText mPasswordView;
+    private EditText mPasswordConfirmView;
     private EditText mPhoneView;
     private View mProgressView;
     private View mRegisterFormView;
+
+
+    private String mAgeGroup;
+    private String mEthnicity;
+    private String mGender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +81,15 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         setContentView(R.layout.activity_register);
         // Set up the register form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailConfirmView = (AutoCompleteTextView) findViewById(R.id.email_confirm);
         populateAutoComplete();
         mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordConfirmView = (EditText) findViewById(R.id.password_confirm);
         mPhoneView = (EditText)findViewById(R.id.phone);
+
+        mAgeGroup = "";
+        mEthnicity = "";
+        mGender = "";
 
         Button mRegisterButton = (Button) findViewById(R.id.register_button);
         mRegisterButton.setOnClickListener(new OnClickListener() {
@@ -84,6 +101,69 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         mRegisterFormView = findViewById(R.id.register_form);
         mProgressView = findViewById(R.id.register_progress);
+
+
+        Spinner spinnerAgeGroup = (Spinner)findViewById(R.id.spinner_age_group);
+        Spinner spinnerEthnicity = (Spinner)findViewById(R.id.spinner_ethnicity);
+        Spinner spinnerGender = (Spinner)findViewById(R.id.spinner_gender);
+        ArrayAdapter<CharSequence> adapterAgeGroup = ArrayAdapter.createFromResource(this, R.array.age_group_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapterEthnicity = ArrayAdapter.createFromResource(this, R.array.ethnicity_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapterGender = ArrayAdapter.createFromResource(this, R.array.gender_array, android.R.layout.simple_spinner_item);
+
+
+        adapterAgeGroup.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterEthnicity.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+
+
+        spinnerAgeGroup.setAdapter(adapterAgeGroup);
+        spinnerAgeGroup.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                mAgeGroup = parent.getItemAtPosition(position).toString();
+                Log.i(UtilityVariables.tag,"age group selected: "+mAgeGroup);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerGender.setAdapter(adapterGender);
+        spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                mGender = parent.getItemAtPosition(position).toString();
+                Log.i(UtilityVariables.tag,"gender selected: "+mGender);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerEthnicity.setAdapter(adapterEthnicity);
+        spinnerEthnicity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                mEthnicity = parent.getItemAtPosition(position).toString();
+                Log.i(UtilityVariables.tag,"ethnicity selected: "+mEthnicity);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void populateAutoComplete() {
@@ -143,48 +223,112 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         // Reset errors.
         mEmailView.setError(null);
+        mEmailConfirmView.setError(null);
         mPasswordView.setError(null);
+        mPasswordConfirmView.setError(null);
         mPhoneView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
+        String emailConfirm = mEmailConfirmView.getText().toString();
+
         String password = mPasswordView.getText().toString();
+        String passwordConfirm = mPasswordConfirmView.getText().toString();
+
         String phone = mPhoneView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
+        if(TextUtils.isEmpty(email))
+        {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+        else if (!UtilityFunctions.isEmailValid(email))
+        {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+        else if(TextUtils.isEmpty(emailConfirm))
+        {
+            mEmailConfirmView.setError(getString(R.string.error_field_required));
+            focusView = mEmailConfirmView;
+            cancel = true;
+        }
+
+        else if (!emailConfirm.equals(email))
+        {
+            mEmailConfirmView.setError(getString(R.string.error_field_email_matching));
+            focusView = mEmailConfirmView;
+            cancel = true;
+        }
+
+
+
+        else if(TextUtils.isEmpty(password))
+        {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+        else if(TextUtils.isEmpty(passwordConfirm))
+        {
+            mPasswordConfirmView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordConfirmView;
+            cancel = true;
+        }
+
+        else if (!passwordConfirm.equals(password))
+        {
+            mPasswordConfirmView.setError(getString(R.string.error_field_password_matching));
+            focusView = mPasswordConfirmView;
+            cancel = true;
+        }
+
+
         //check for a valid phone
 
-        if (!TextUtils.isEmpty(phone) && !UtilityFunctions.isPhoneValid(phone)) {
+        else if (!TextUtils.isEmpty(phone) && !UtilityFunctions.isPhoneValid(phone)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !UtilityFunctions.isPasswordValid(password)) {
+        else if (!TextUtils.isEmpty(password) && !UtilityFunctions.isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        else if (TextUtils.isEmpty(email))
+        {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!UtilityFunctions.isEmailValid(email)) {
+        }
+
+        else if (!UtilityFunctions.isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
 
-        if (cancel) {
+        if (cancel)
+        {
             // There was an error; don't attempt register and focus the first
             // form field with an error.
             focusView.requestFocus();
-        } else {
+        }
+        else
+        {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
@@ -224,6 +368,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 }
             });
         } else {
+
+
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -301,6 +447,14 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mPassword = password;
             mPhone = phone;
             message = null;
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(mPassword.getBytes(StandardCharsets.UTF_8));
+                Log.i(UtilityVariables.tag,hash.toString());
+            }catch (Exception ex)
+            {
+                Log.i(UtilityVariables.tag,"Exception is getting message digest in register page");
+            }
         }
 
         @Override
@@ -311,6 +465,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 data.put("email",mEmail);
                 data.put("password",mPassword);
                 data.put("phone_number",mPhone);
+                data.put("phone_number",mPhone);
+                data.put("age_group",mAgeGroup);
+                data.put("ethnicity",mEthnicity);
+                data.put("gender",mGender);
 
                 String urlString = UtilityVariables.REGISTER_GUARDIAN;
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);

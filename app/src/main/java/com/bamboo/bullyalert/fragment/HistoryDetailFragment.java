@@ -1,18 +1,34 @@
 package com.bamboo.bullyalert.fragment;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bamboo.bullyalert.R;
+import com.bamboo.bullyalert.UtilityPackage.UtilityFunctions;
+import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.adapter.MyHistoryDetailRecyclerViewAdapter;
+import com.bamboo.bullyalert.model.History;
 import com.bamboo.bullyalert.model.HistoryDetail;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * A fragment representing a list of Items.
@@ -28,19 +44,18 @@ public class HistoryDetailFragment extends Fragment {
     private String mName = "";
     private OnListFragmentInteractionListener mListener;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+    private History mHistory = null;
+    private Context mContext;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mNotificationDetailAdapter;
+
     public HistoryDetailFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static HistoryDetailFragment newInstance(String name) {
+    public static HistoryDetailFragment newInstance(History history) {
         HistoryDetailFragment fragment = new HistoryDetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_NAME, name);
+        args.putSerializable(ARG_NAME, history);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +65,8 @@ public class HistoryDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mName = getArguments().getString(ARG_NAME);
+            //mName = getArguments().getString(ARG_NAME);
+            mHistory = (History) getArguments().getSerializable(ARG_NAME);
         }
     }
 
@@ -58,18 +74,26 @@ public class HistoryDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history_detail_page, container, false);
+        this.mContext = view.getContext();
 
-        TextView nameTextView = (TextView) view.findViewById(R.id.name);
-        nameTextView.setText(mName);
-
-        // Set the adapter
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        if (recyclerView != null) {
-            Context context = view.getContext();
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new MyHistoryDetailRecyclerViewAdapter(HistoryDetail.ITEMS, mListener));
-        }
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                LinearLayoutManager.VERTICAL);
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        populateHistoryDetails();
         return view;
+    }
+
+
+
+    private void populateHistoryDetails()
+    {
+        if(mHistory != null)
+        {
+
+        }
     }
 
 
@@ -102,6 +126,8 @@ public class HistoryDetailFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(HistoryDetail.Item item);
+        void onListFragmentInteraction(HistoryDetail item);
     }
+
+
 }

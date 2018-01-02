@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,7 +20,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bamboo.bullyalert.Database.UserDAO;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.adapter.MyProfileRecyclerViewAdapter;
@@ -33,42 +31,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class ProfileFragment extends Fragment
 {
 
-    private int mColumnCount = 1;
     private static final String ARG_COLUMN_COUNT = "column-count";
     private OnListFragmentInteractionListener mListener;
 
     private Context mContext;
     private RecyclerView mRecyclerView;
     private List<Profile> mListMonitoringUserProfiles;
-    private RecyclerView.Adapter mMonitoringUserProfilesAdapter;
 
 
+    private ProgressDialog mProgressDialog ;
 
 
-
-    private PopulateMonitoringUserProfiles populateMonitoringUserProfiles = null;
-    private UserDAO mUserDao;
-
-
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public ProfileFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static ProfileFragment newInstance(int columnCount) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -81,9 +60,9 @@ public class ProfileFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+        /*if (getArguments() != null) {
+            int mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+        }*/
     }
 
     @Override
@@ -91,8 +70,7 @@ public class ProfileFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_profile_page, container, false);
 
         this.mContext = view.getContext();
-        //mProgressDialog = new ProgressDialog(mContext);
-        this.mUserDao = new UserDAO(mContext);
+        mProgressDialog = new ProgressDialog(mContext);
 
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
@@ -114,7 +92,7 @@ public class ProfileFragment extends Fragment
 
     private void populateMonitoringUserProfilesFunction()
     {
-        populateMonitoringUserProfiles = new PopulateMonitoringUserProfiles();
+        PopulateMonitoringUserProfiles populateMonitoringUserProfiles = new PopulateMonitoringUserProfiles();
         populateMonitoringUserProfiles.execute((Void) null);
     }
 
@@ -137,19 +115,8 @@ public class ProfileFragment extends Fragment
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener
     {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Profile userProfile);
     }
 
@@ -169,7 +136,7 @@ public class ProfileFragment extends Fragment
                 mListMonitoringUserProfiles.add(monitoringUserProfile);
 
             }
-            mMonitoringUserProfilesAdapter = new MyProfileRecyclerViewAdapter(mListMonitoringUserProfiles,mListener,mContext);
+            RecyclerView.Adapter mMonitoringUserProfilesAdapter = new MyProfileRecyclerViewAdapter(mListMonitoringUserProfiles, mListener, mContext);
             mRecyclerView.setAdapter(mMonitoringUserProfilesAdapter);
 
         }catch (Exception e)
@@ -181,9 +148,7 @@ public class ProfileFragment extends Fragment
 
     private void getMonitoringUsers()
     {
-
-        //// TODO: 10/23/2017  just doing instagram. add other social networks later
-
+        mProgressDialog.setMessage("Processing your monitoring request...");
         String urlString = UtilityVariables.INSTAGRAM_GET_MONITORING_USERS+"?email="+UtilityVariables.USER_EMAIL;
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 urlString,
@@ -192,6 +157,7 @@ public class ProfileFragment extends Fragment
                     public void onResponse(String response) {
                         try
                         {
+                            mProgressDialog.dismiss();
                             JSONObject jsonObject = new JSONObject(response);
                             String success = jsonObject.optString("success");
                             if(success.equals("success"))
@@ -206,15 +172,12 @@ public class ProfileFragment extends Fragment
                                     showMonitoringUserProfiles(jsonArray);
                                 }
                             }
-                            else
-                            {
-
-                            }
 
 
                         }
                         catch (Exception e)
                         {
+                            Toast.makeText(mContext,"Something bad happened!",Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -257,14 +220,8 @@ public class ProfileFragment extends Fragment
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success)
-            {
-
-            }
-            else
-            {
-            }
+        protected void onPostExecute(final Boolean success)
+        {
         }
 
         @Override

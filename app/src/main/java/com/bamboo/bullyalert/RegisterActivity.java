@@ -447,14 +447,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mPassword = password;
             mPhone = phone;
             message = null;
-            try {
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                byte[] hash = digest.digest(mPassword.getBytes(StandardCharsets.UTF_8));
-                Log.i(UtilityVariables.tag,hash.toString());
-            }catch (Exception ex)
-            {
-                Log.i(UtilityVariables.tag,"Exception is getting message digest in register page");
-            }
+
         }
 
         @Override

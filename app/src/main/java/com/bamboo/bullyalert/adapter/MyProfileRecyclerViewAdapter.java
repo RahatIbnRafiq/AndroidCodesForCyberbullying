@@ -9,12 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
-import com.bamboo.bullyalert.fragment.LoginDialogFragment;
 import com.bamboo.bullyalert.fragment.ProfileFragment.OnListFragmentInteractionListener;
 import com.bamboo.bullyalert.R;
-import com.bamboo.bullyalert.model.AddUser;
 import com.bamboo.bullyalert.model.Profile;
-import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;

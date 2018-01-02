@@ -1,15 +1,12 @@
 package com.bamboo.bullyalert;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,33 +15,21 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bamboo.bullyalert.Database.MonitoringPost;
-import com.bamboo.bullyalert.Database.User;
-import com.bamboo.bullyalert.Database.UserDAO;
 import com.bamboo.bullyalert.IntentServices.IntentServiceNotification;
-import com.bamboo.bullyalert.UtilityPackage.UtilityFunctions;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.fragment.HistoryDetailFragment;
 import com.bamboo.bullyalert.fragment.HistoryFragment;
-import com.bamboo.bullyalert.fragment.LoginDialogFragment;
 import com.bamboo.bullyalert.fragment.NotificationDetailFragment;
 import com.bamboo.bullyalert.fragment.NotificationFragment;
 import com.bamboo.bullyalert.fragment.ProfileDetailFragment;
 import com.bamboo.bullyalert.fragment.ProfileFragment;
-import com.bamboo.bullyalert.fragment.SettingFragment;
 import com.bamboo.bullyalert.fragment.AddUserFragment;
 import com.bamboo.bullyalert.model.History;
 import com.bamboo.bullyalert.model.Notification;
 import com.bamboo.bullyalert.model.Profile;
-import com.bamboo.bullyalert.model.ProfileDetail;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 public class NavigationActivity extends AppCompatActivity
@@ -84,10 +69,6 @@ public class NavigationActivity extends AppCompatActivity
 
         setAlarmNotification();
         Intent intent = getIntent();
-        if(intent.hasExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS_AUTHENTICATION))
-        {
-            showLoginDialog();
-        }
         if (intent.hasExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS))
         {
             HashMap<String,Notification> mNotifications;
@@ -107,17 +88,6 @@ public class NavigationActivity extends AppCompatActivity
                     .replace(R.id.content_frame, fragment)
                     .commit();
         }
-    }
-
-
-    private void showLoginDialog()
-    {
-        UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
-        Fragment fragment = NotificationFragment.newInstance(null);
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("instagram credentials");
-        loginDialogFragment.setTargetFragment(fragment, 300);
-        loginDialogFragment.show(fragmentManager, "fragment_login_dialog");
     }
 
 
@@ -224,8 +194,8 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(Profile monitoringUserProfile)
     {
-        Log.i(UtilityVariables.tag,"hello here it is in the navigation activity: "+monitoringUserProfile.getmUserId());
-        Fragment fragment = ProfileDetailFragment.newInstance(monitoringUserProfile.getmUserId());
+        Log.i(UtilityVariables.tag,"hello here it is in the navigation activity: "+monitoringUserProfile.getmUserName());
+        Fragment fragment = ProfileDetailFragment.newInstance(monitoringUserProfile.getmUserName());
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)

@@ -35,6 +35,8 @@ import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +121,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
             Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                    .setAction(android.R.string.ok, new OnClickListener() {
                         @Override
                         @TargetApi(Build.VERSION_CODES.M)
                         public void onClick(View v) {
@@ -312,9 +314,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
 
             try {
-
                 String urlLoginString = UtilityVariables.LOGIN_GUARDIAN+"?email="+mEmail+ "&password="+mPassword;
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlLoginString);
+                Log.i(UtilityVariables.tag,resultjson.toString());
 
                 message = resultjson.optString("message");
                 if (resultjson.optString("success").equals("success"))
@@ -327,6 +329,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Log.i(UtilityVariables.tag,"login credentials did not match: "+this.getClass().getName());
                     return false;
                 }
+
 
             } catch (Exception e) {
                 Log.i(UtilityVariables.tag,"Exception in getting login information: "+e.toString()+this.getClass().getName());

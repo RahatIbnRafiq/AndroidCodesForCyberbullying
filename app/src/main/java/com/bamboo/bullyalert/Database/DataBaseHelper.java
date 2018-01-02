@@ -60,6 +60,7 @@ public class DataBaseHelper extends SQLiteOpenHelper
     public static final String MONITORING_POSTS_TABLE_COLUMN_POSTID = "POSTID";
     public static final String MONITORING_POSTS_TABLE_COLUMN_LAST_TIME_CHECKED = "LAST_TIME_CHECKED";
     public static final String MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK = "SOCIAL_NETWORK";
+    public static final String MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE = "POST_CODE";
 
     public static final String CREATE_MONITORING_POSTS_TABLE = "CREATE TABLE IF NOT EXISTS "
             + MONITORING_POSTS_TABLE + "(" +
@@ -69,7 +70,8 @@ public class DataBaseHelper extends SQLiteOpenHelper
             MONITORING_POSTS_TABLE_COLUMN_USERNAME + " TEXT, " +
             MONITORING_POSTS_TABLE_COLUMN_USERID + " TEXT, " +
             MONITORING_POSTS_TABLE_COLUMN_LAST_TIME_CHECKED + " TEXT, " +
-            MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK + " TEXT" +
+            MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK + " TEXT," +
+            MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE + " TEXT" +
             ")";
 
 

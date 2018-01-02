@@ -82,6 +82,25 @@ public class UtilityFunctions {
         return password.length() >= UtilityVariables.MIN_PASSWORD_LENGTH;
     }
 
+    public static JSONObject getJSonContentFromUrl(String urlString)
+    {
+        try {
+
+            URL url = new URL(urlString);
+            HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+            InputStream inputStream =null;
+            inputStream = new BufferedInputStream(urlConnection.getInputStream());
+            String response = UtilityFunctions.streamToString(inputStream);
+            JSONObject resultjson = new JSONObject(response);
+            return resultjson;
+
+
+        }catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     public static JSONObject getJsonStringFromGetRequestUrlString(String urlString)
     {
         try {

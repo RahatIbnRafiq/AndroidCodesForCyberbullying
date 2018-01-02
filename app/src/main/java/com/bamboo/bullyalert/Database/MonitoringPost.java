@@ -15,6 +15,7 @@ public class MonitoringPost
     public String postid;
     public String lastTimeChecked;
     public String socialNetwork;
+    public String postCode;
 
     public MonitoringPost(String email, String username, String userid, String postid, String lastTimeChecked, String socialNetwork)
     {

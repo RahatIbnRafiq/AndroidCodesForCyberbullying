@@ -19,27 +19,40 @@ public class UtilityVariables {
     public static final String REGISTER_GUARDIAN = ROOT_URL+"/api/guardian/register";
     public static final String ADD_NOTIFICATION = ROOT_URL+"/api/notification/add";
     public static final String ADD_NOTIFICATION_FEEDBACK = ROOT_URL+"/api/notificationfeedback/add";
+    public static final String GET_NOTIFICATIONS = ROOT_URL+"/api/guardian/getNotifications";
+    public static final String GET_FEEDBACKS = ROOT_URL+"/api/guardian/getNotificationFeedbacks";
+    public static final String INSTAGRAM_MONITOR_USER_SERVER  = ROOT_URL+"/api/guardian/instagram/useraddRequest";
+
+    public static String URL_ROOT_INSTAGRAM_WEBSITE = "https://www.instagram.com/";
 
     public static final String GET_REQUEST_METHOD = "GET";
     public static final int READ_TIMEOUT = 60*1000;
     public static final int CONNECTION_TIMEOUT = 60*1000;
     public static final long ALARM_INTERVAL = 60*1000;
+    public static final int COMMENT_REQUEST_LIMIT = 100;
 
 
-    public static final String INSTAGRAM_CLIENT_ID = "362741ea25924668af07edfb3873e3a2";
-    public static final String INSTAGRAM_MONITOR_USER_SERVER  = ROOT_URL+"/api/guardian/instagram/useraddRequest";
-    public static final String INSTAGRAM_CALLBACK_URL = "http://localhost";
-    public static final String INSTAGRAM_AUTH_URL = "https://api.instagram.com/oauth/authorize/";
-    public static final String INSTAGRAM_GET_ACCESS_TOKEN  = ROOT_URL+"/api/guardian/instagramAuthToken";
+    //public static final String INSTAGRAM_CLIENT_ID = "362741ea25924668af07edfb3873e3a2";
+    //public static final String INSTAGRAM_MONITOR_USER_SERVER  = ROOT_URL+"/api/guardian/instagram/useraddRequest";
+    //public static final String INSTAGRAM_CALLBACK_URL = "http://localhost";
+    //public static final String INSTAGRAM_AUTH_URL = "https://api.instagram.com/oauth/authorize/";
+    //public static final String INSTAGRAM_GET_ACCESS_TOKEN  = ROOT_URL+"/api/guardian/instagramAuthToken";
     public static final String INSTAGRAM_GET_MONITORING_USERS = ROOT_URL+"/api/guardian/instagram/getMonitoringUsers";
+    public static final String INSTAGRAM_GET_NOTIFICATION_COUNT = ROOT_URL+"/api/notification/count";
+    public static final String INSTAGRAM_GET_FEEDBACK_COUNT = ROOT_URL+"/api/feedback/count";
+    public static final String INSTAGRAM_GET_CLAFFISIER= ROOT_URL+"/api/classifier/getClassifier";
+    public static final String INSTAGRAM_ADD_CLAFFISIER= ROOT_URL+"/api/classifier/add";
 
 
-    public static final String GET_NOTIFICATIONS = ROOT_URL+"/api/guardian/getNotifications";
-    public static final String GET_FEEDBACKS = ROOT_URL+"/api/guardian/getNotificationFeedbacks";
 
-    public static final String INSTAGRAM_API_USER_SEARCH  = "https://api.instagram.com/v1/users/search/?q=";
 
-    public static final String INSTAGRAM_API_USER_INFORMATION  = "https://api.instagram.com/v1/users/";
+    //public static final String INSTAGRAM_API_USER_SEARCH  = "https://api.instagram.com/v1/users/search/?q=";
+
+    //public static final String INSTAGRAM_API_USER_INFORMATION  = "https://api.instagram.com/v1/users/";
+
+
+    public static final String INSTAGRAM_API_USER_SEARCH  = "https://www.instagram.com/";
+    public static final String INSTAGRAM_API_GET_COMMENTS  = "https://www.instagram.com/graphql/query/?query_id=17852405266163336&variables=";
 
 
     public static final int MIN_PASSWORD_LENGTH = 4;

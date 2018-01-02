@@ -33,6 +33,7 @@ public class MonitoringPostDAO extends MonitoringPostDBDAO
         values.put(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_POSTID, post.postid);
         values.put(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_LAST_TIME_CHECKED, post.lastTimeChecked);
         values.put(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK, post.socialNetwork);
+        values.put(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE, post.postCode);
         return database.insert(DataBaseHelper.MONITORING_POSTS_TABLE, null, values);
     }
 
@@ -79,6 +80,7 @@ public class MonitoringPostDAO extends MonitoringPostDBDAO
                     post.postid = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_POSTID));
                     post.lastTimeChecked = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_LAST_TIME_CHECKED));
                     post.socialNetwork = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK));
+                    post.postCode = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE));
                     postMap.put(post.postid,post);
                     //Log.i(UtilityVariables.tag,"postid:  in db right now: "+post.postid+"  email:"+post.email);
 

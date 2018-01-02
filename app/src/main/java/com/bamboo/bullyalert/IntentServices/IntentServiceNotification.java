@@ -55,7 +55,7 @@ import java.util.TimeZone;
  */
 public class IntentServiceNotification extends IntentService
 {
-    private List<String> mMonitoringUserIds;
+    private List<String> mMonitoringUserNames;
     HashMap<String,MonitoringPost> mPostsFromDB;
     HashMap<String,MonitoringPost> mPostsFromAPI;
     HashMap<String,ArrayList<Comment>> mNewCommentsForPost;
@@ -84,13 +84,13 @@ public class IntentServiceNotification extends IntentService
     {
         if(UtilityVariables.IS_ALARM_ON == false)
         {
-            Log.i(UtilityVariables.tag,"Alarm is set to false. exiting intent service");
+            Log.i(UtilityVariables.tag,this.getClass().getName()+" alarm is set to false. Exiting");
             return;
         }
-        Log.i(UtilityVariables.tag,"inside intent service now.");
+        Log.i(UtilityVariables.tag,this.getClass().getName()+" inside intent service now.");
         try
         {
-            this.mMonitoringUserIds = new ArrayList<>();
+            this.mMonitoringUserNames = new ArrayList<>();
             mPostsFromDB = new HashMap<>();
             mPostsFromAPI = new HashMap<>();
 
@@ -109,17 +109,16 @@ public class IntentServiceNotification extends IntentService
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in IntentServiceNotification- onHandleIntent :"+e.toString());
+            Log.i(UtilityVariables.tag,this.getClass().getName()+" exception in function:onHandleIntent: "+e.toString());
         }
 
     }
+
 
     public void getAllMonitoringUsers()
     {
         try
         {
-            //Log.i(UtilityVariables.tag,"Inside Notification Intent Service");
-            //Log.i(UtilityVariables.tag,"getAllMonitoringUsers function");
             String urlString = UtilityVariables.INSTAGRAM_GET_MONITORING_USERS+"?email="+UtilityVariables.USER_EMAIL;
             JSONObject jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
             String success = jsonObject.optString("success");
@@ -128,29 +127,27 @@ public class IntentServiceNotification extends IntentService
                 JSONArray jsonArray = jsonObject.getJSONArray("users");
                 if(jsonArray.length() == 0)
                 {
-                    Log.i(UtilityVariables.tag,"not monitoring any users");
+                    Log.i(UtilityVariables.tag,this.getClass().getName()+ "not monitoring any users");
                 }
                 else
                 {
-
-                    //Log.i(UtilityVariables.tag,"Got the monitoring user ids");
                     for(int i=0;i<jsonArray.length();i++)
                     {
                         JSONObject userObject = jsonArray.getJSONObject(i);
-                        mMonitoringUserIds.add(userObject.optString("userid"));
-                        //Log.i(UtilityVariables.tag,"user: "+userObject.optString("userid"));
+                        mMonitoringUserNames.add(userObject.optString("username"));
+                        Log.i(UtilityVariables.tag,this.getClass().getName()+"  monitoring users:"+userObject.optString("username"));
 
                     }
                 }
             }
             else
             {
-                Log.i(UtilityVariables.tag,"Something went wrong: "+jsonObject.toString());
+                Log.i(UtilityVariables.tag,this.getClass().getName()+ "Something went wrong when trying to get monitoring users from the server: "+jsonObject.toString());
             }
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception getAllMonitoringUsers function IntentServiceNotification: "+e.toString());
+            Log.i(UtilityVariables.tag,this.getClass().getName()+"Exception getAllMonitoringUsers function "+e.toString());
         }
 
 
@@ -160,39 +157,81 @@ public class IntentServiceNotification extends IntentService
     {
         UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_GETTING_POSTS;
         mPostsFromDB = mMonitoringPostDao.fetchAllMonitoringPostsByEmail(UtilityVariables.USER_EMAIL);
-        for (Map.Entry<String, MonitoringPost> entry : mPostsFromDB.entrySet())
-        {
-            String postid = entry.getKey();
-            MonitoringPost post = entry.getValue();
-            //Log.i(UtilityVariables.tag,"new last time checked: "+post.lastTimeChecked);
-        }
+        Log.i(UtilityVariables.tag,this.getClass().getName()+" posts collected from phone database: "+mPostsFromDB.size());
     }
 
     public void getRecentNewPostsForUsers() throws Exception
     {
 
-        for(int i=0;i<mMonitoringUserIds.size();i++)
+        for(int i=0;i<mMonitoringUserNames.size();i++)
         {
-            String urlString = "https://api.instagram.com/v1/users/"+mMonitoringUserIds.get(i)+
-                    "/media/recent/?access_token="+UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN;
+            boolean foundLast = false;
+            String urlString = UtilityVariables.URL_ROOT_INSTAGRAM_WEBSITE+mMonitoringUserNames.get(i)+ "/?__a=1";
+            String max_id = null;
 
-            JSONObject jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
-            if(jsonObject == null)
-                return;
-            //Log.i(UtilityVariables.tag,"json string after post get request:"+jsonObject.toString());
-            JSONArray userdata = jsonObject.optJSONArray("data");
-            for(int j=0;j<userdata.length();j++)
+            while(foundLast == false)
             {
-                MonitoringPost post = new MonitoringPost();
-                JSONObject record = userdata.optJSONObject(j);
-                post.email = UtilityVariables.USER_EMAIL;
-                post.username = record.getJSONObject("user").optString("username");
-                post.userid = mMonitoringUserIds.get(i);
-                post.postid = record.optString("id");
-                post.lastTimeChecked = 0+"";
-                post.socialNetwork = "Instagram";
-                mPostsFromAPI.put(post.postid,post);
+                try {
+                    Log.i(UtilityVariables.tag,"getting posts for user: "+mMonitoringUserNames.get(i)+"  "+urlString);
+                    JSONObject jsonObject = UtilityFunctions.getJSonContentFromUrl(urlString);
+                    jsonObject = jsonObject.getJSONObject("user");
+                    String userid = jsonObject.optString("id");
+
+                    if(jsonObject.getJSONObject("media") != null
+                            && jsonObject.getJSONObject("media").has("nodes")
+                            && jsonObject.getJSONObject("media").getJSONArray("nodes").length() > 0)
+                    {
+                        //Log.i(UtilityVariables.tag,"inside if condition");
+                        JSONArray postDataArray = jsonObject.getJSONObject("media").getJSONArray("nodes");
+                        if(postDataArray.length() == 0)
+                            foundLast = true;
+                        for(int k=0;k<postDataArray.length();k++)
+                        {
+                            //Log.i(UtilityVariables.tag,postDataArray.getJSONObject(k).toString());
+                            JSONObject postjson = postDataArray.getJSONObject(k);
+                            String postid = postjson.optString("id");
+                            if(mPostsFromDB.containsKey(postid))
+                            {
+                                foundLast = true;
+                                break;
+                            }
+                            else
+                            {
+                                MonitoringPost post = new MonitoringPost();
+                                post.postid = postid;
+                                post.userid = userid;
+                                post.username = mMonitoringUserNames.get(i);
+                                post.email = UtilityVariables.USER_EMAIL;
+                                post.lastTimeChecked = 0+"";
+                                post.socialNetwork = "Instagram";
+                                post.postCode = postjson.optString("code");
+                                mPostsFromAPI.put(postid, post);
+                                max_id = postid;
+                            }
+
+                        }
+
+                    }
+                    Log.i(UtilityVariables.tag,"size of new post list: "+mPostsFromAPI.size());
+                    if(foundLast == false && max_id != null)
+                    {
+                        urlString = UtilityVariables.URL_ROOT_INSTAGRAM_WEBSITE+mMonitoringUserNames.get(i)+ "/?__a=1&max_id="+max_id;
+                        max_id = null;
+                    }
+                    else
+                        break;
+
+
+                }
+                catch (Exception e)
+                {
+                    foundLast = true;
+                }
             }
+
+
+
+
 
         }
     }
@@ -206,7 +245,6 @@ public class IntentServiceNotification extends IntentService
         {
             String postid = entry.getKey();
             MonitoringPost post = entry.getValue();
-            //Log.i(UtilityVariables.tag,"posts from api: "+postid);
             if(!mPostsFromDB.containsKey(postid))
             {
                 long s = mMonitoringPostDao.insertMonitoringPost(post);
@@ -214,9 +252,8 @@ public class IntentServiceNotification extends IntentService
                 newPostMap.put(postid,post);
             }
         }
-
-        mPostsFromDB.putAll(newPostMap);
         //Log.i(UtilityVariables.tag,"total post before new posts in database: "+mPostsFromDB.size());
+        mPostsFromDB.putAll(newPostMap);
         //Log.i(UtilityVariables.tag,"total new posts inserted into database this time: "+newPostMap.size());
         //Log.i(UtilityVariables.tag,"total post after new posts in database: "+mPostsFromDB.size());
     }
@@ -226,68 +263,58 @@ public class IntentServiceNotification extends IntentService
         UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_GETTING_COMMENTS;
         for (Map.Entry<String, MonitoringPost> entry : mPostsFromDB.entrySet())
         {
-
-            String postid = entry.getKey();
+            ArrayList<Comment> newComments = new ArrayList<>();
+            ArrayList<Comment> oldComments = new ArrayList<>();
             MonitoringPost post = entry.getValue();
-            //Log.i(UtilityVariables.tag,"post id: "+postid);
+            String postid = entry.getKey();
             try
             {
-                ArrayList<Comment> newComments = new ArrayList<>();
-                ArrayList<Comment> oldComments = new ArrayList<>();
-                String urlString = "https://api.instagram.com/v1/media/"+postid+"/comments?access_token="+UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN;
-
-                JSONObject jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
-                //Log.i(UtilityVariables.tag,"json string for comments: "+jsonObject.toString());
-                JSONObject metaJSon = jsonObject.getJSONObject("meta");
-                String code = metaJSon.getString("code");
-
-                if(code.equals("200"))
+                String postCode = post.postCode;
+                String variableString = "{\"shortcode\":\""+postCode+"\",\"first\":"+UtilityVariables.COMMENT_REQUEST_LIMIT+",\"after\":null}";
+                String urlString = UtilityVariables.INSTAGRAM_API_GET_COMMENTS+variableString;
+                JSONObject jsonObject = UtilityFunctions.getJSonContentFromUrl(urlString);
+                //Log.i(UtilityVariables.tag,"response for comment json: "+jsonObject.toString());
+                String status = jsonObject.optString("status");
+                if(status.equals("ok"))
                 {
-                    JSONArray data = jsonObject.optJSONArray("data");
+                    JSONArray commentArray = jsonObject.optJSONObject("data")
+                            .optJSONObject("shortcode_media").optJSONObject("edge_media_to_comment").optJSONArray("edges");
                     long newLastTimeChecked = 0;
-                    for(int i=0;i<data.length();i++)
-                    {
-                        JSONObject record = data.optJSONObject(i);
-                        String createdTimeString = record.optString("created_time");
+                    for (int k = 0; k < commentArray.length(); k++) {
+                        JSONObject record = commentArray.optJSONObject(k).optJSONObject("node");
+                        String createdTimeString = record.optString("created_at");
                         String commentText = record.optString("text");
-                        JSONObject fromJson = record.optJSONObject("from");
-                        String commenterName = fromJson.optString("username");
-                        if(Long.parseLong(post.lastTimeChecked) == 0 ||
-                                Long.parseLong(createdTimeString) > Long.parseLong(post.lastTimeChecked))
-                        {
-                            // this comment came after this post's last time checked comment by the app
-                            //first time this post's comments have been checked. Add all of them and keep track of the latest comment time.
-                            newComments.add(new Comment(commentText,commenterName,Long.parseLong(createdTimeString)));
-                            newLastTimeChecked = Math.max(newLastTimeChecked,Long.parseLong(createdTimeString));
-                            //Log.i(UtilityVariables.tag,"last time checked: "+Long.parseLong(createdTimeString));
+                        String commenterName = record.optJSONObject("owner").optString("username");
+                        if (Long.parseLong(post.lastTimeChecked) == 0 ||
+                                Long.parseLong(createdTimeString) > Long.parseLong(post.lastTimeChecked)) {
+                            newComments.add(new Comment(commentText, commenterName, Long.parseLong(createdTimeString)));
+                            newLastTimeChecked = Math.max(newLastTimeChecked, Long.parseLong(createdTimeString));
+                        } else {
+                            oldComments.add(new Comment(commentText, commenterName, Long.parseLong(createdTimeString)));
                         }
-                        else
-                        {
-                            oldComments.add(new Comment(commentText,commenterName,Long.parseLong(createdTimeString)));
-                        }
-
                     }
-                    //Log.i(UtilityVariables.tag,"previous last time checked for post id: "+postid+"  value: "+post.lastTimeChecked);
+
                     post.lastTimeChecked = String.valueOf(newLastTimeChecked); //setting the new last time checked
-                    //Log.i(UtilityVariables.tag,"new last time checked for post id: "+postid+"  value: "+post.lastTimeChecked);
-                }
 
-                if(newComments.size() > 0)
+                    if (newComments.size() > 0) {
+                        Collections.reverse(oldComments);
+                        Collections.reverse(newComments);
+                        Log.i(UtilityVariables.tag, "new comments found!:" + newComments.size() + " for post: " + post.postCode);
+                        this.mNewCommentsForPost.put(postid, newComments);
+                        this.mOldCommentsForPost.put(postid, oldComments);
+                    }
+                }
+                else
                 {
-                    Collections.reverse(oldComments);
-                    Collections.reverse(newComments);
-                    Log.i(UtilityVariables.tag,"new comments found!:"+newComments.size());
-                    this.mNewCommentsForPost.put(postid,newComments);
-                    this.mOldCommentsForPost.put(postid,oldComments);
+                    Log.i(UtilityVariables.tag,"status was not ok: "+jsonObject.toString());
                 }
-
 
             }catch (Exception e)
             {
-                Log.i(UtilityVariables.tag,"Exception in getCommentsForPosts function, IntentServiceNotification: "+e.toString());
+                Log.i(UtilityVariables.tag,"Exception, Intent service, getCommentsForPosts function: "+e.toString());
             }
-            //Log.i(UtilityVariables.tag,"__________________________________________________");
         }
+
 
 
         }
@@ -296,7 +323,7 @@ public class IntentServiceNotification extends IntentService
     public void classifyPosts()
     {
         UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_CLASSIFYING;
-        Log.i(UtilityVariables.tag," inside the classify posts function. total posts for whcih new comments were found:"+mNewCommentsForPost.size());
+        Log.i(UtilityVariables.tag," inside the classify posts function. total posts for which new comments were found:"+mNewCommentsForPost.size());
         Log.i(UtilityVariables.tag,"___________________________________");
         for (Map.Entry<String, ArrayList<Comment>> entry : mNewCommentsForPost.entrySet())
         {
@@ -325,34 +352,8 @@ public class IntentServiceNotification extends IntentService
             notification.setmUserName(this.mPostsFromDB.get(postid).username);
 
             mNotifications.put(postid,notification);
-
-            //Log.i(UtilityVariables.tag,"___________________________________");
         }
     }
-
-    private String getTokenFromDatabase()
-    {
-        User user = mUserDao.fetchUser(UtilityVariables.USER_EMAIL);
-        if(user == null)
-        {
-            //not in the database.
-            return null;
-        }
-        else if(user.instagramToken != null)
-        {
-            //instagram token exists
-            UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN = user.instagramToken;
-            return user.instagramToken;
-        }
-        else if(user.instagramToken == null)
-        {
-            //instagram token does not exist
-            return null;
-        }
-        return null;
-
-    }
-
 
     public void updateMonitoringPostTable()
     {
@@ -382,26 +383,6 @@ public class IntentServiceNotification extends IntentService
     }
 
 
-    public void createNotificationAuthentication(Context context, String msg, String msgText, String msgAlert)
-    {
-        Intent intent = new Intent(context,NavigationActivity.class);
-        intent.putExtra(UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS_AUTHENTICATION,UtilityVariables.INTENT_VARIABLE_NOTIFICATIONS_AUTHENTICATION);
-        PendingIntent notificationIntent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(msg)
-                        .setContentText(msgAlert).setContentText(msgText);
-
-        mBuilder.setContentIntent(notificationIntent);
-        mBuilder.setDefaults(NotificationCompat.DEFAULT_SOUND);
-        mBuilder.setAutoCancel(true);
-
-        NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(2,mBuilder.build());
-    }
-
-
     private void sendNotificationDataToServer()
     {
         for (Map.Entry<String, Notification> entry : mNotifications.entrySet())
@@ -410,7 +391,6 @@ public class IntentServiceNotification extends IntentService
             Notification notification = entry.getValue();
             ArrayList<Comment> newComments = notification.getmNewComments();
             long lastCommentTime = 0;
-            //String commentString = "";
             SimpleDateFormat sdf = new SimpleDateFormat();
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             JSONArray commentArray = new JSONArray();
@@ -418,9 +398,6 @@ public class IntentServiceNotification extends IntentService
             {
                 if(newComments.get(i).mCreatedTime > lastCommentTime)
                     lastCommentTime = newComments.get(i).mCreatedTime;
-                //commentString  = commentString + newComments.get(i).getmCommentText()+" ::TIME::";
-                //String timeString = sdf.format(new Date(newComments.get(i).mCreatedTime*1000)).toString()+"-->";
-                //commentString  = commentString + newComments.get(i).getmCommentText()+" -->";
                 JSONObject commentObject = new JSONObject();
                 try
                 {
@@ -435,14 +412,10 @@ public class IntentServiceNotification extends IntentService
                 }
 
             }
-            Log.i(UtilityVariables.tag,"last comment time api instagram"+lastCommentTime);
             String notificationId = UtilityVariables.USER_EMAIL+
                     ","+postid+","+lastCommentTime+"";
             long timeAtNotification = System.currentTimeMillis();
 
-
-            //System.out.println(sdf.format(new Date(lastCommentTime)).toString());
-            Date date = new Date(lastCommentTime);
             notification.setmNotificationId(notificationId);
 
             try
@@ -460,11 +433,10 @@ public class IntentServiceNotification extends IntentService
 
                 String urlString = UtilityVariables.ADD_NOTIFICATION;
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
-                String message = resultjson.optString("message").toString();
 
                 if (resultjson.optString("success").toString().equals("success"))
                 {
-                    Log.i(UtilityVariables.tag,"adding notification success: "+this.getClass().getName());
+                    //Log.i(UtilityVariables.tag,"adding notification success: "+this.getClass().getName());
                 }
                 else
                 {
@@ -532,6 +504,104 @@ public class IntentServiceNotification extends IntentService
     }
 
 
+    private void universalClassifierUpdate()
+    {
+        int notificationCount = 0;
+        int feedbackCount = 0;
+
+        try
+        {
+            String urlString = UtilityVariables.INSTAGRAM_GET_NOTIFICATION_COUNT+"?email="+UtilityVariables.USER_EMAIL;
+            JSONObject jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
+            String success = jsonObject.optString("success");
+            if(success.equals("success"))
+            {
+                notificationCount = jsonObject.optInt("message");
+                Log.i(UtilityVariables.tag, "notification count from server: "+notificationCount);
+            }
+            else
+            {
+                Log.i(UtilityVariables.tag,this.getClass().getName()+ "Something went wrong when trying to get notification count from the server: "+jsonObject.toString());
+            }
+            urlString = UtilityVariables.INSTAGRAM_GET_FEEDBACK_COUNT+"?email="+UtilityVariables.USER_EMAIL;
+            jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
+            success = jsonObject.optString("success");
+            if(success.equals("success"))
+            {
+                feedbackCount = jsonObject.optInt("message");
+                Log.i(UtilityVariables.tag, "feedback count from server: "+feedbackCount);
+            }
+            else
+            {
+                Log.i(UtilityVariables.tag,this.getClass().getName()+ "Something went wrong when trying to get feedback count from the server: "+jsonObject.toString());
+            }
+
+            float condition = (float)feedbackCount / (float) notificationCount;
+
+
+
+            if(condition < 0.5 || notificationCount == 0)
+            {
+                Log.i(UtilityVariables.tag,"not enough feedback. general classifier will be applied");
+                urlString = UtilityVariables.INSTAGRAM_GET_CLAFFISIER;
+                Log.i(UtilityVariables.tag,urlString);
+                jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
+                Log.i(UtilityVariables.tag,"getting classifier general from server: "+jsonObject.toString());
+                success = jsonObject.optString("success");
+                if(success.equals("success"))
+                {
+                    JSONArray weightArray = jsonObject.optJSONArray("weights");
+                    if(weightArray.length() > 0)
+                    {
+                        Log.i(UtilityVariables.tag,weightArray.toString());
+                        JSONObject weights = weightArray.getJSONObject(0);
+                        double[] coefficients = new double[4];
+                        coefficients[0] = Double.parseDouble(weights.optString("interceptWeight"));
+                        coefficients[1] = Double.parseDouble(weights.optString("negativeCommentCountWeight"));
+                        coefficients[2] = Double.parseDouble(weights.optString("negativeCommentPercentageWeight"));
+                        coefficients[3] = Double.parseDouble(weights.optString("negativeWordPerNegativeCommentWeight"));
+                        this.mClassifier.setCoefficients(coefficients);
+                        Log.i(UtilityVariables.tag, "classifier is updated to the general classifier.");
+                    }
+                    else
+                    {
+                        Log.i(UtilityVariables.tag," no weights array for the general classifier was found in the server.");
+                    }
+                }
+            }
+            else
+            {
+                Log.i(UtilityVariables.tag," enough feedbacks. send this classifier to the server.");
+                JSONObject data = new JSONObject();
+                data.put("interceptWeight",this.mClassifier.getCoefficients()[0]);
+                data.put("negativeCommentCountWeight",this.mClassifier.getCoefficients()[1]);
+                data.put("negativeCommentPercentageWeight",this.mClassifier.getCoefficients()[2]);
+                data.put("negativeWordPerNegativeCommentWeight",this.mClassifier.getCoefficients()[3]);
+
+
+
+                urlString = UtilityVariables.INSTAGRAM_ADD_CLAFFISIER;
+                JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
+                String message = resultjson.optString("message").toString();
+
+                if (resultjson.optString("success").toString().equals("success"))
+                {
+                    Log.i(UtilityVariables.tag,"adding classifier success: "+this.getClass().getName());
+                }
+                else
+                {
+                    Log.i(UtilityVariables.tag,"adding classifier failed: "+this.getClass().getName());
+                }
+
+            }
+
+        }catch (Exception e)
+        {
+            Log.i(UtilityVariables.tag,this.getClass().getName()+"Exception universalClassifierUpdate function "+e.toString());
+        }
+    }
+
+
 
 
     public void checkInstagramNotification()
@@ -539,35 +609,24 @@ public class IntentServiceNotification extends IntentService
         try
         {
             Log.i(UtilityVariables.tag, "checkInstagramNotification function ");
-            if (UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN != null || getTokenFromDatabase() != null)
-            {
-                updateClassifier();
-                getAllMonitoringUsers();
-                getAllPostsFromDatabase();
-                getRecentNewPostsForUsers();
-                insertNewPostsInDatabase();
-                getCommentsForPosts();
-                classifyPosts();
-                sendNotificationDataToServer();
-                createNotification(getApplicationContext(),
-                        "Possible Bullying!!",
-                        "On Instagram!!"+this.mInstagramBullyingInstance+" instances",
-                        "Possible Bullying!");
-                updateMonitoringPostTable();
-                UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
+            updateClassifier();
+            getAllMonitoringUsers();
+            getAllPostsFromDatabase();
+            getRecentNewPostsForUsers();
+            insertNewPostsInDatabase();
+            getCommentsForPosts();
+            classifyPosts();
+            sendNotificationDataToServer();
+            createNotification(getApplicationContext(),"Possible Bullying!!","On Instagram!!"+this.mInstagramBullyingInstance+" instances","Possible Bullying!");
+            updateMonitoringPostTable();
+            universalClassifierUpdate();
+            UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
 
-            }
-            else
-            {
-                createNotificationAuthentication(getApplicationContext(),
-                        "authentication needed",
-                        "authentication needed",
-                        "authentication needed");
-
-            }
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception in checkInstagramNotification function: "+e.toString());
         }
     }
+
+
 }

@@ -50,6 +50,15 @@ public class Classifier {
 
     }
 
+
+    public double[] getCoefficients() {
+        return coefficients;
+    }
+
+    public void setCoefficients(double[] coefficients) {
+        this.coefficients = coefficients;
+    }
+
     public double predict(double[]featureValues)
     {
         float yhat = 0;
@@ -171,6 +180,11 @@ public class Classifier {
 
     public void updateClassifier(ArrayList<NotificationFeedback> feedbacks)
     {
+        for(int i=0;i<this.coefficients.length;i++)
+        {
+            Log.i(UtilityVariables.tag," before updating coefficients: "+this.coefficients[i]);
+
+        }
         try
         {
             ClassifierTrainingData tr = new ClassifierTrainingData();
@@ -188,14 +202,7 @@ public class Classifier {
                 tr.featurevalues = featureValues;
                 int f = Integer.parseInt(feedback.mFeedback);
                 double p = Double.parseDouble(feedback.getmPredicted());
-                if(f == 0 && p < 0.5)
-                    tr.truePrediction = 1.0;
-                else if(f == 0 && p > 0.5)
-                    tr.truePrediction = 0.0;
-                else if(f == 1 && p > 0.5)
-                    tr.truePrediction = 1.0;
-                else
-                    tr.truePrediction = 0.0;
+                tr.truePrediction = (float)f;
                 for(int j=0; j< BOOTSTRAP_VARIABLE;j++)
                     this.trainingDataList.add(tr);
             }
@@ -211,7 +218,7 @@ public class Classifier {
                     sum_error += error*error;
                     for(int i=0;i<tr.featurevalues.length;i++)
                     {
-                        this.coefficients[i] = this.coefficients[i]*Classifier.LEARNING_RATE*error*tr.featurevalues[i]*yhat*(1.0-yhat);
+                        this.coefficients[i] = this.coefficients[i]+Classifier.LEARNING_RATE*error*tr.featurevalues[i]*yhat*(1.0-yhat);
                     }
 
                 }
@@ -225,6 +232,12 @@ public class Classifier {
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception: "+this.getClass().getName()+" updateClassifier function: "+e.toString());
+        }
+
+        for(int i=0;i<this.coefficients.length;i++)
+        {
+            Log.i(UtilityVariables.tag," after updating coefficients: "+this.coefficients[i]);
+
         }
     }
 

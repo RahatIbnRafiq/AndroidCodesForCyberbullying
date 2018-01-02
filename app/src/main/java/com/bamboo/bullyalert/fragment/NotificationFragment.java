@@ -34,17 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
-public class NotificationFragment extends Fragment implements LoginDialogFragment.LoginDialogFragmentListener{
-
-    // TODO: Customize parameter argument names
+public class NotificationFragment extends Fragment
+{
     private static final String ARG_NOTIFICATION = "NOTIFICATION";
-    // TODO: Customize parameters
 
     private OnListFragmentInteractionListener mListener;
 
@@ -58,12 +50,7 @@ public class NotificationFragment extends Fragment implements LoginDialogFragmen
 
 
     private UserDAO mUserDao;
-    private GetAuthenticationToken getAuthToken = null;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public NotificationFragment() {
     }
 
@@ -190,97 +177,10 @@ public class NotificationFragment extends Fragment implements LoginDialogFragmen
         mListener = null;
     }
 
-    @Override
-    public void onFinishLoginDialog(String code)
-    {
-        Log.i(UtilityVariables.tag,"web view finished. got the code: "+code);
-        getAuthToken = new GetAuthenticationToken(code);
-        getAuthToken.execute((Void) null);
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Notification item);
     }
-    private class GetAuthenticationToken extends AsyncTask<Void, Void, Boolean>
-    {
-        private final String mCode;
-        String authToken = null;
 
-        GetAuthenticationToken(String code) {
-            mCode = code;
-        }
-
-        protected Boolean doInBackground(Void... params) {
-
-            try {
-
-                String urlString = UtilityVariables.INSTAGRAM_GET_ACCESS_TOKEN+"?code="+mCode;
-                JSONObject resultjson = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
-
-                if(resultjson.optString("success") != null && resultjson.optString("success").equals("success"))
-                {
-                    resultjson = new JSONObject(resultjson.optString("token"));
-                    Log.i(UtilityVariables.tag,"Trying to parse the token from server response. "+resultjson.toString());
-                    authToken = resultjson.optString("access_token");
-                    Log.i(UtilityVariables.tag,"got the auth token: "+authToken);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success)
-            {
-                if(authToken != null)
-                {
-                    try
-                    {
-                        if(mUserDao == null)
-                            mUserDao = new UserDAO(mContext);
-                        mUserDao.deleteUser(UtilityVariables.USER_EMAIL);
-                        User user = new User(UtilityVariables.USER_EMAIL,authToken);
-                        UtilityVariables.INSTAGRAM_AUTHENTICATION_TOKEN = authToken;
-                        long f = mUserDao.insertUser(user);
-                        Log.i(UtilityVariables.tag,"successfully inserted: "+f);
-
-                    }catch (Exception e)
-                    {
-                        Log.i(UtilityVariables.tag,e.toString());
-                    }
-
-                }
-
-            }
-            else
-            {
-                Log.i(UtilityVariables.tag,"Error happened while getting authentication token");
-            }
-        }
-
-        @Override
-        protected void onCancelled()
-        {
-            Log.i(UtilityVariables.tag,"Process was cancelled");
-        }
-    }
 
 }

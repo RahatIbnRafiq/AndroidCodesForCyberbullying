@@ -141,7 +141,7 @@ public class ProfileFragment extends Fragment
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"exception while parsing json array in showUserSearchResult: "+e.toString());
+            Log.i(UtilityVariables.tag,"exception while parsing json array in showUserSearchResult: "+e.toString()+" class: "+this.getClass().getName());
         }
 
     }
@@ -187,7 +187,7 @@ public class ProfileFragment extends Fragment
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.i(UtilityVariables.tag,"volley error"+error.toString());
+                        Log.i(UtilityVariables.tag,"volley error"+error.toString()+" class : "+this.getClass().getName());
                     }
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);

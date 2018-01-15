@@ -15,6 +15,7 @@ public class UtilityVariables {
     //public static final String ROOT_URL = "http://192.168.0.13:3000";
     //public static final String ROOT_URL = "http://192.168.5.179:3000";
     public static final String ROOT_URL = "http://128.138.232.94:3000";
+    //public static final String ROOT_URL = "http://10.0.0.128:3000";
     public static final String LOGIN_GUARDIAN = ROOT_URL+"/api/guardian/login";
     public static final String REGISTER_GUARDIAN = ROOT_URL+"/api/guardian/register";
     public static final String ADD_NOTIFICATION = ROOT_URL+"/api/notification/add";
@@ -28,7 +29,7 @@ public class UtilityVariables {
     public static final String GET_REQUEST_METHOD = "GET";
     public static final int READ_TIMEOUT = 60*1000;
     public static final int CONNECTION_TIMEOUT = 60*1000;
-    public static final long ALARM_INTERVAL = 60*1000;
+    public static final long ALARM_INTERVAL = 60*1000*30;
     public static final int COMMENT_REQUEST_LIMIT = 100;
 
 

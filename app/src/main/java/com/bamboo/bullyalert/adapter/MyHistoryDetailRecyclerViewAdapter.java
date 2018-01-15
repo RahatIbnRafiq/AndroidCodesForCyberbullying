@@ -15,14 +15,14 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link HistoryDetail.Item} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class MyHistoryDetailRecyclerViewAdapter extends RecyclerView.Adapter<MyHistoryDetailRecyclerViewAdapter.ViewHolder> {
 
     private final List<HistoryDetail.Item> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyHistoryDetailRecyclerViewAdapter(List<HistoryDetail.Item> items, OnListFragmentInteractionListener listener) {
+    public MyHistoryDetailRecyclerViewAdapter(List<HistoryDetail.Item> items, OnListFragmentInteractionListener listener)
+    {
         mValues = items;
         mListener = listener;
     }
@@ -43,10 +43,8 @@ public class MyHistoryDetailRecyclerViewAdapter extends RecyclerView.Adapter<MyH
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    //mListener.onListFragmentInteraction(holder.mItem);
+                if (null != mListener)
+                {
                 }
             }
         });
@@ -58,10 +56,10 @@ public class MyHistoryDetailRecyclerViewAdapter extends RecyclerView.Adapter<MyH
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mPersonView;
-        public final TextView mCommentView;
-        public HistoryDetail.Item mItem;
+        private final View mView;
+        private final TextView mPersonView;
+        private final TextView mCommentView;
+        private HistoryDetail.Item mItem;
 
         public ViewHolder(View view) {
             super(view);

@@ -25,12 +25,6 @@ import com.bamboo.bullyalert.model.NotificationDetail;
 
 import java.util.ArrayList;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class NotificationDetailFragment extends Fragment {
 
     // TODO: Customize parameter argument names
@@ -64,7 +58,7 @@ public class NotificationDetailFragment extends Fragment {
     @SuppressWarnings("unused")
     public static NotificationDetailFragment newInstance(Notification notification) {
         NotificationDetailFragment fragment = new NotificationDetailFragment();
-        Log.i(UtilityVariables.tag,"Inside notification detail fragment. Initializing bundle");
+        //Log.i(UtilityVariables.tag,"Inside notification detail fragment. Initializing bundle");
         Bundle args = new Bundle();
         args.putSerializable(ARG_NAME, notification);
         fragment.setArguments(args);
@@ -169,11 +163,11 @@ public class NotificationDetailFragment extends Fragment {
         String feedback = feedbackValue+"";
         String predicted = mNotification.getmLevel()+"";
         String notificationId = mNotification.getmNotificationId();
-        Log.i(UtilityVariables.tag,"notification id is :"+notificationId);
+        //Log.i(UtilityVariables.tag,"notification id is :"+notificationId);
         NotificationFeedback notificationFeedback = new NotificationFeedback(UtilityVariables.USER_EMAIL,
                 notificationId,comments,predicted,feedback);
         long s = mNotificationFeedbackDao.insertUser(notificationFeedback);
-        Log.i(UtilityVariables.tag, "inserted feedback: "+s);
+        //Log.i(UtilityVariables.tag, "inserted feedback: "+s);
 
     }
     private void populateNotificationDetails()
@@ -181,7 +175,7 @@ public class NotificationDetailFragment extends Fragment {
         if(mNotification != null)
         {
             commentList = mNotification.getmNewComments();
-            Log.i(UtilityVariables.tag,"inside populateNotificationDetails function in notificationDetailFragment.");
+            //Log.i(UtilityVariables.tag,"inside populateNotificationDetails function in notificationDetailFragment.");
             mNotificationDetailAdapter = new MyNotificationDetailRecyclerViewAdapter(commentList,mListener);
             mRecyclerView.setAdapter(mNotificationDetailAdapter);
         }

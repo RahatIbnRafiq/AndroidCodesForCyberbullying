@@ -1,12 +1,15 @@
 package com.bamboo.bullyalert;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,6 +19,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bamboo.bullyalert.IntentServices.IntentServiceNotification;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
@@ -96,7 +100,7 @@ public class NavigationActivity extends AppCompatActivity
     {
         if(UtilityVariables.IS_ALARM_ON == false)
         {
-            Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is set to true now.");
+            //Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is set to true now.");
             mNotificationIntent = new Intent(this, IntentServiceNotification.class);
             mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mPendingNotificationIntent = PendingIntent.getService(this, 1, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -112,18 +116,69 @@ public class NavigationActivity extends AppCompatActivity
         }
         else
         {
-            Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is already set");
+            //Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is already set");
         }
 
     }
 
+
+
+    private void loggingOut()
+    {
+        UtilityVariables.IS_ALARM_ON = false;
+        //mPendingNotificationIntent = PendingIntent.getService(this, 1, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if(this.mAlarmManager != null)
+        {
+            //Log.i(UtilityVariables.tag,"alarm manager isnt null");
+            this.mAlarmManager.cancel(mPendingNotificationIntent);
+        }
+        else
+        {
+            //Log.i(UtilityVariables.tag,"alarm manager is null");
+        }
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        FragmentManager fm = getSupportFragmentManager();
+        fm.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                Fragment f = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                if(f instanceof AddUserFragment)
+                    toolbar.setTitle(R.string.add_new_profile);
+                else if (f instanceof NotificationFragment)
+                    toolbar.setTitle(R.string.check_notification);
+                else if (f instanceof ProfileFragment)
+                    toolbar.setTitle(R.string.monitoring_profiles);
+            }
+        });
+        int sizeOfBackStack = fm.getBackStackEntryCount();
+
+        if(sizeOfBackStack == 0)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Please use Logout option to exit the app.")
+                    .setTitle("Log out?");
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        else
+        {
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START))
+            {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+            else
+            {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -157,12 +212,12 @@ public class NavigationActivity extends AppCompatActivity
             //mPendingNotificationIntent = PendingIntent.getService(this, 1, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             if(this.mAlarmManager != null)
             {
-                Log.i(UtilityVariables.tag,"alarm manager isnt null");
+                //Log.i(UtilityVariables.tag,"alarm manager isnt null");
                 this.mAlarmManager.cancel(mPendingNotificationIntent);
             }
             else
             {
-                Log.i(UtilityVariables.tag,"alarm manager is null");
+                //Log.i(UtilityVariables.tag,"alarm manager is null");
             }
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
@@ -174,6 +229,7 @@ public class NavigationActivity extends AppCompatActivity
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)
+                .addToBackStack(null)
                 .commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -194,7 +250,7 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(Profile monitoringUserProfile)
     {
-        Log.i(UtilityVariables.tag,"hello here it is in the navigation activity: "+monitoringUserProfile.getmUserName());
+        //Log.i(UtilityVariables.tag,"hello here it is in the navigation activity: "+monitoringUserProfile.getmUserName());
         Fragment fragment = ProfileDetailFragment.newInstance(monitoringUserProfile.getmUserName());
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()

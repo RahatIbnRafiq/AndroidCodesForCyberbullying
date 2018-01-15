@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 
 public class Classifier {
     private static final int EPOCH = 1000;
-    private static final double LEARNING_RATE = 0.001;
+    private static final double LEARNING_RATE = 0.01;
     private static final int BOOTSTRAP_VARIABLE = 5;
 
     private static Classifier instance = null;
@@ -78,7 +78,6 @@ public class Classifier {
         double negativeWordPerNegativeComment = 0;
         for(Comment comment:comments)
         {
-            //Log.i(UtilityVariables.tag,comment);
             boolean isNegative = false;
             String commentText = comment.getmCommentText();
             commentText = commentText.toLowerCase().trim();
@@ -111,10 +110,8 @@ public class Classifier {
 
 
     private void loadNegativeWords(InputStream is) throws IOException {
-        //String str = "";
 
         if (is != null) {
-            //StringBuilder sb = new StringBuilder();
             String line;
 
             try {
@@ -134,7 +131,7 @@ public class Classifier {
                     is.close();
                 }catch (IOException ex)
                 {
-                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class load negative words function.");
+                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class loadNegativeWords function."+ex.toString());
                 }
 
             }
@@ -142,10 +139,7 @@ public class Classifier {
     }
 
     private void loadTrainingData(InputStream is) throws IOException {
-        //String str = "";
-
         if (is != null) {
-            //StringBuilder sb = new StringBuilder();
             String line;
 
             try {
@@ -154,7 +148,6 @@ public class Classifier {
 
                 while ((line = reader.readLine()) != null) {
                     String []tokens = line.split(",");
-                    //Log.i(UtilityVariables.tag,tokens[0].toString()+","+tokens[1].toString()+","+tokens[2].toString()+","+tokens[3].toString());
                     ClassifierTrainingData tr = new ClassifierTrainingData();
                     tr.featurevalues[0] = 1.0;
                     tr.featurevalues[1] = Double.parseDouble(tokens[0]);
@@ -171,7 +164,7 @@ public class Classifier {
                     is.close();
                 }catch (IOException ex)
                 {
-                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class load training data function.");
+                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class loadTrainingData function: "+ex.toString());
                 }
             }
         }
@@ -180,9 +173,8 @@ public class Classifier {
 
     public void updateClassifier(ArrayList<NotificationFeedback> feedbacks)
     {
-        for(int i=0;i<this.coefficients.length;i++)
-        {
-            Log.i(UtilityVariables.tag," before updating coefficients: "+this.coefficients[i]);
+        for (double coefficient : this.coefficients) {
+            Log.i(UtilityVariables.tag, " before updating coefficients: " + coefficient);
 
         }
         try
@@ -192,14 +184,13 @@ public class Classifier {
             {
                 NotificationFeedback feedback = feedbacks.get(i);
                 String[]comments = feedback.getmComments().split("--->");
-                ArrayList<Comment> commentList = new ArrayList<>();
-                for(int j = 0; j< comments.length ; j++)
-                {
-                    commentList.add(new Comment(comments[j],"",0));
+                ArrayList<Comment> commentList;
+                commentList = new ArrayList<>();
+                for (String comment : comments) {
+                    commentList.add(new Comment(comment, "", 0));
                 }
 
-                double[]featureValues = this.getFeatureValues(commentList);
-                tr.featurevalues = featureValues;
+                tr.featurevalues = this.getFeatureValues(commentList);
                 int f = Integer.parseInt(feedback.mFeedback);
                 double p = Double.parseDouble(feedback.getmPredicted());
                 tr.truePrediction = (float)f;
@@ -234,9 +225,8 @@ public class Classifier {
             Log.i(UtilityVariables.tag,"Exception: "+this.getClass().getName()+" updateClassifier function: "+e.toString());
         }
 
-        for(int i=0;i<this.coefficients.length;i++)
-        {
-            Log.i(UtilityVariables.tag," after updating coefficients: "+this.coefficients[i]);
+        for (double coefficient : this.coefficients) {
+            Log.i(UtilityVariables.tag, " after updating coefficients: " + coefficient);
 
         }
     }

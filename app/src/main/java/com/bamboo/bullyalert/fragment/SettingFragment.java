@@ -15,17 +15,10 @@ import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.adapter.MySettingRecyclerViewAdapter;
 import com.bamboo.bullyalert.model.Setting;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
+
 public class SettingFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 2;
     private OnListFragmentInteractionListener mListener;
 

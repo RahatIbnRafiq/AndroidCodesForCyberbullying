@@ -37,7 +37,7 @@ public class UtilityInstagramAPI
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.i(UtilityVariables.tag,"onResponse function: "+response+this.getClass().getName());
+                            //Log.i(UtilityVariables.tag,"onResponse function: "+response+this.getClass().getName());
                             try
                             {
                                 JSONObject jsonObject = new JSONObject(response);

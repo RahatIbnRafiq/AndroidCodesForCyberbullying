@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bamboo.bullyalert.Database.MonitoringPost;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.fragment.NotificationFragment.OnListFragmentInteractionListener;
@@ -17,15 +16,7 @@ import com.bamboo.bullyalert.model.Notification;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link Notification.Item} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 
 class   CustomComparator implements Comparator<Notification> {
     @Override
@@ -39,21 +30,12 @@ class   CustomComparator implements Comparator<Notification> {
 public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNotificationRecyclerViewAdapter.ViewHolder> {
     private final OnListFragmentInteractionListener mListener;
 
-    //private final HashMap<String,Notification> mNotifications;
     private final ArrayList<Notification> mNotificationList;
 
     public MyNotificationRecyclerViewAdapter(ArrayList<Notification> notifications, OnListFragmentInteractionListener listener)
     {
-        //this.mNotificationList = new ArrayList<>();
         this.mListener = listener;
         this.mNotificationList = notifications;
-        /*Log.i(UtilityVariables.tag,"inside MyNotificationRecyclerViewAdapter constructor: size of notifications: "+mNotifications.size());
-        for (Map.Entry<String, Notification> entry : mNotifications.entrySet())
-        {
-            String postid = entry.getKey();
-            Notification n = entry.getValue();
-            mNotificationList.add(n);
-        }*/
         Collections.sort(mNotificationList, new CustomComparator());
 
     }
@@ -95,7 +77,7 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
                 @Override
                 public void onClick(View v)
                 {
-                    Log.i(UtilityVariables.tag,"clicked username: "+notif.getmPostId());
+                    //Log.i(UtilityVariables.tag,"clicked username: "+notif.getmPostId());
                     if (null != mListener)
                     {
                         mListener.onListFragmentInteraction(notif);
@@ -114,7 +96,7 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in onBindViewHolder: "+e.toString());
+            Log.i(UtilityVariables.tag,"Exception in "+this.getClass().getName()+" onBindViewHolder function: "+e.toString());
         }
     }
 
@@ -126,10 +108,10 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
-        public final View mView;
-        public TextView mLevel;
-        public TextView mUserName;
-        public TextView mSocialNetwork;
+        private final View mView;
+        private TextView mLevel;
+        private TextView mUserName;
+        private TextView mSocialNetwork;
 
 
         public ViewHolder(View view)

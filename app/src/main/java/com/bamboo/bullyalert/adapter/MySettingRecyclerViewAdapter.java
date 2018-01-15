@@ -14,11 +14,6 @@ import com.bamboo.bullyalert.model.Setting;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link Setting.Item} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class MySettingRecyclerViewAdapter extends RecyclerView.Adapter<MySettingRecyclerViewAdapter.ViewHolder> {
 
     private final List<Setting.Item> mValues;

@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/welcome"
-                android:textSize="24sp"/>
+                android:textSize="24sp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -100,23 +100,6 @@
             </android.support.design.widget.TextInputLayout>
 
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_phone"
-                    android:inputType="phone"
-                    android:imeActionId="@+id/register"
-                    android:imeActionLabel="@string/action_register"
-                    android:imeOptions="actionUnspecified"
-                    android:maxLines="1" />
-
-            </android.support.design.widget.TextInputLayout>
-
 
             <LinearLayout
                 android:id="@+id/age_group_linearlayout"
@@ -129,12 +112,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/age_group"/>
+                    android:text="@string/age_group" />
 
                 <Spinner
                     android:id="@+id/spinner_age_group"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
 
@@ -149,12 +132,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ethnicity"/>
+                    android:text="@string/ethnicity" />
 
                 <Spinner
                     android:id="@+id/spinner_ethnicity"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
@@ -168,13 +151,33 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/gender"/>
+                    android:text="@string/gender" />
 
                 <Spinner
                     android:id="@+id/spinner_gender"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/terms_and_conditions_linearlayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="@dimen/text_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:text="By clicking Register, I agree to the Terms and Conditions: https://sites.google.com/site/cucybersafety/terms-and-conditions-for-bullyalert"
+                    android:id="@+id/TextView1"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:autoLink="web">
+                </TextView>
+
+            </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/register_button"
@@ -183,14 +186,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_register"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/copyright"/>
+                android:text="@string/copyright" />
 
         </LinearLayout>
     </ScrollView>

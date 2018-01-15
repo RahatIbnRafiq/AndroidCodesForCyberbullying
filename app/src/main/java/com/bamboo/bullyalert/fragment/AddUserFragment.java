@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -166,7 +165,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         this.mSocialNetworkName = parent.getItemAtPosition(position).toString();
-        Log.i(UtilityVariables.tag,"social network selected: "+this.mSocialNetworkName);
+        //Log.i(UtilityVariables.tag,"social network selected: "+this.mSocialNetworkName);
     }
 
     @Override
@@ -197,7 +196,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
         if(this.mSocialNetworkName.equals("Instagram"))
         {
             String urlString = UtilityVariables.INSTAGRAM_API_USER_SEARCH+username+"/?__a=1";
-            Log.i(UtilityVariables.tag,urlString);
+            Log.i(UtilityVariables.tag,"Searching for user using this url now: "+urlString);
             StringRequest stringRequest = new StringRequest(Request.Method.GET,
                     urlString,
                     new Response.Listener<String>() {
@@ -205,7 +204,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                         public void onResponse(String response) {
                             progressDialog.dismiss();
                             mListUserSearch = new ArrayList<>();
-                            Log.i(UtilityVariables.tag,"onResponse function add user fragment: "+response);
+                            //Log.i(UtilityVariables.tag,"onResponse function add user fragment: "+response);
                             try
                             {
                                 JSONObject jsonObject = new JSONObject(response);
@@ -228,7 +227,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                             }
                             catch (Exception e)
                             {
-                                Log.i(UtilityVariables.tag,"exception while parsing json array in showUserSearchResult: "+e.toString());
+                                Log.i(UtilityVariables.tag, "exception while parsing json array in showUserSearchResult: "+e.toString()+"class: "+this.getClass().getName());
                                 progressDialog.dismiss();
                                 mListUserSearch.clear();
                                 mUserSearchResultAdapter.notifyDataSetChanged();
@@ -243,7 +242,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                             progressDialog.dismiss();
                             mListUserSearch.clear();
                             mUserSearchResultAdapter.notifyDataSetChanged();
-                            Log.i(UtilityVariables.tag,error.toString());
+                            Log.i(UtilityVariables.tag,error.toString()+" in function showUSerSearchResult class "+this.getClass().getName());
                             Toast.makeText(mContext,"No user found. Try with a different username please.",Toast.LENGTH_SHORT).show();
 
                         }
@@ -286,7 +285,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
                 }
                 data.put("data",array);
-                Log.i(UtilityVariables.tag,"debugging error in PerformMonitoringRequest inner class: "+data.toString());
+                //Log.i(UtilityVariables.tag,"debugging error in PerformMonitoringRequest inner class: "+data.toString()+" in class "+this.getClass().getName());
 
                 String urlString = UtilityVariables.INSTAGRAM_MONITOR_USER_SERVER;
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
@@ -305,7 +304,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
             }catch (Exception e)
             {
-                Log.i(UtilityVariables.tag,e.toString());
+                Log.i(UtilityVariables.tag,e.toString()+" in performMonitoringRequest in class "+this.getClass().getName());
                 return false;
             }
         }
@@ -332,7 +331,7 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
             if (success)
             {
-                Log.i(UtilityVariables.tag,"hello inside add user fragment, user was inserted into the db in the server.");
+                Log.i(UtilityVariables.tag,"User has been inserted successfully in the server database");
                 Intent intent = new Intent(mContext, NavigationActivity.class);
                 startActivity(intent);
             }

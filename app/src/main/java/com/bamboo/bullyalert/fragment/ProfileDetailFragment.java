@@ -2,10 +2,8 @@ package com.bamboo.bullyalert.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +18,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bamboo.bullyalert.Database.User;
+
 import com.bamboo.bullyalert.Database.UserDAO;
 import com.bamboo.bullyalert.R;
-import com.bamboo.bullyalert.UtilityPackage.UtilityFunctions;
-import com.bamboo.bullyalert.UtilityPackage.UtilityInstagramWebsite;
+
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.model.ProfileDetail;
 import com.squareup.picasso.Picasso;
@@ -143,7 +140,7 @@ public class ProfileDetailFragment extends Fragment
 
     private void loadUserDetails()
     {
-        Log.i(UtilityVariables.tag,"inside load user details function");
+        //Log.i(UtilityVariables.tag,"inside load user details function");
         final ProgressDialog progressDialog = new ProgressDialog(mContext);
         progressDialog.setMessage("Getting the user details...");
         progressDialog.show();
@@ -192,7 +189,7 @@ public class ProfileDetailFragment extends Fragment
                         public void onErrorResponse(VolleyError error)
                         {
                             progressDialog.dismiss();
-                            Log.i(UtilityVariables.tag,"getInstagramUserProfileDetail response: "+error.toString());
+                            Log.i(UtilityVariables.tag," error in loaduserdetails function in  response: "+error.toString()+"class : "+this.getClass().getName());
                         }
                     }
             );
@@ -203,6 +200,7 @@ public class ProfileDetailFragment extends Fragment
 
         }catch (Exception e)
         {
+            Log.i(UtilityVariables.tag,"Exception in loadUserDetails function class: "+this.getClass().getName());
 
         }
     }

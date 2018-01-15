@@ -44,7 +44,7 @@ public class UtilityFunctions {
         }
         catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in getJsonStringFromPostRequestUrlString function: "+e.toString());
+            Log.i(UtilityVariables.tag,"Exception in getJsonStringFromPostRequestUrlString function: "+e.toString()+" in UtilityFunctions class");
             return null;
         }
     }
@@ -70,7 +70,7 @@ public class UtilityFunctions {
                     return false;
             }catch (Exception e)
             {
-                Log.i(UtilityVariables.tag,"email is wrong! "+e.toString());
+                //Log.i(UtilityVariables.tag,"email is wrong! "+e.toString());
                 return false;
             }
 
@@ -121,7 +121,7 @@ public class UtilityFunctions {
             return resultjson;
         } catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in getJsonStringFromGetRequestUrlString function: "+e.toString());
+            Log.i(UtilityVariables.tag,"Exception in getJsonStringFromGetRequestUrlString function: "+e.toString()+" class: UtilityFunctions");
             return null;
         }
 
@@ -160,7 +160,7 @@ public class UtilityFunctions {
                         is.close();
                     }catch (IOException ex)
                     {
-                        Log.i(UtilityVariables.tag,"IO Exception in streamToString function: "+ex.toString());
+                        Log.i(UtilityVariables.tag,"IO Exception in streamToString function: "+ex.toString()+" in class: UtilityFunctions");
                     }
 
                 }
@@ -172,7 +172,7 @@ public class UtilityFunctions {
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in streamToString "+e.toString());
+            Log.i(UtilityVariables.tag,"Exception in streamToString "+e.toString()+" class: UtilityFunctions");
         }
 
         return null;

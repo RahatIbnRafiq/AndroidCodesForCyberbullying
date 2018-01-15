@@ -60,11 +60,11 @@ public class NotificationFragment extends Fragment
         NotificationFragment fragment = new NotificationFragment();
         if(notification != null)
         {
-            Log.i(UtilityVariables.tag, "inside notification fragment. size of the notification list: " + notification.size());
+            //Log.i(UtilityVariables.tag, "inside notification fragment. size of the notification list: " + notification.size());
         }
         else
         {
-            Log.i(UtilityVariables.tag, "inside notification fragment. size of the notification list: null");
+            //Log.i(UtilityVariables.tag, "inside notification fragment. size of the notification list: null");
         }
         Bundle args = new Bundle();
         args.putSerializable(ARG_NOTIFICATION,notification);
@@ -122,7 +122,7 @@ public class NotificationFragment extends Fragment
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir)
             {
-                Log.i(UtilityVariables.tag,"swiped item: "+viewHolder.getAdapterPosition());
+                //Log.i(UtilityVariables.tag,"swiped item: "+viewHolder.getAdapterPosition());
                 Notification n = mNotificationList.get(viewHolder.getAdapterPosition());
                 n.setmFeedBack(-2);
                 mNotificationList.remove(viewHolder.getAdapterPosition());
@@ -145,7 +145,7 @@ public class NotificationFragment extends Fragment
     {
         if(mNotifications != null)
         {
-            Log.i(UtilityVariables.tag, "inside populateNotification function. size of the notification map: " + mNotifications.size());
+            //Log.i(UtilityVariables.tag, "inside populateNotification function. size of the notification map: " + mNotifications.size());
             for (Map.Entry<String, Notification> entry : mNotifications.entrySet())
             {
                 if(entry.getValue().getmFeedBack() == -1)

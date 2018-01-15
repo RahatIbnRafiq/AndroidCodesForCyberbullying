@@ -66,7 +66,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private AutoCompleteTextView mEmailConfirmView;
     private EditText mPasswordView;
     private EditText mPasswordConfirmView;
-    private EditText mPhoneView;
     private View mProgressView;
     private View mRegisterFormView;
 
@@ -85,7 +84,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         populateAutoComplete();
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordConfirmView = (EditText) findViewById(R.id.password_confirm);
-        mPhoneView = (EditText)findViewById(R.id.phone);
 
         mAgeGroup = "";
         mEthnicity = "";
@@ -166,6 +164,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         });
     }
 
+
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
@@ -226,7 +225,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         mEmailConfirmView.setError(null);
         mPasswordView.setError(null);
         mPasswordConfirmView.setError(null);
-        mPhoneView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
@@ -234,8 +232,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         String password = mPasswordView.getText().toString();
         String passwordConfirm = mPasswordConfirmView.getText().toString();
-
-        String phone = mPhoneView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -294,11 +290,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         //check for a valid phone
 
-        else if (!TextUtils.isEmpty(phone) && !UtilityFunctions.isPhoneValid(phone)) {
+        /*else if (!TextUtils.isEmpty(phone) && !UtilityFunctions.isPhoneValid(phone)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
-        }
+        }*/
 
         // Check for a valid password, if the user entered one.
         else if (!TextUtils.isEmpty(password) && !UtilityFunctions.isPasswordValid(password)) {
@@ -332,7 +328,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserRegisterTask(email, password,phone);
+            mAuthTask = new UserRegisterTask(email, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -439,13 +435,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         private final String mEmail;
         private final String mPassword;
-        private final String mPhone;
         private String message;
 
-        UserRegisterTask(String email, String password,String phone) {
+        UserRegisterTask(String email, String password) {
             mEmail = email;
             mPassword = password;
-            mPhone = phone;
             message = null;
 
         }
@@ -457,8 +451,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 JSONObject data = new JSONObject();
                 data.put("email",mEmail);
                 data.put("password",mPassword);
-                data.put("phone_number",mPhone);
-                data.put("phone_number",mPhone);
                 data.put("age_group",mAgeGroup);
                 data.put("ethnicity",mEthnicity);
                 data.put("gender",mGender);
@@ -468,7 +460,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 message = resultjson.optString("message").toString();
                 if (resultjson.optString("success").toString().equals("success"))
                 {
-                    Log.i(UtilityVariables.tag,"Register success: "+this.getClass().getName());
+                    //Log.i(UtilityVariables.tag,"Register success: "+this.getClass().getName());
                     return true;
                 }
                 else

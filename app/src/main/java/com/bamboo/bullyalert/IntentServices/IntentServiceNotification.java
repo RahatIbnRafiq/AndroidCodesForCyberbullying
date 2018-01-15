@@ -46,13 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 public class IntentServiceNotification extends IntentService
 {
     private List<String> mMonitoringUserNames;
@@ -72,6 +65,8 @@ public class IntentServiceNotification extends IntentService
     private UserDAO mUserDao;
     private NotificationFeedbackDAO mNotificationFeedbackDao;
 
+    private boolean isClassifierUpdated = false;
+
     public IntentServiceNotification()
     {
         super("IntentServiceNotification");
@@ -84,10 +79,10 @@ public class IntentServiceNotification extends IntentService
     {
         if(UtilityVariables.IS_ALARM_ON == false)
         {
-            Log.i(UtilityVariables.tag,this.getClass().getName()+" alarm is set to false. Exiting");
+            //Log.i(UtilityVariables.tag,this.getClass().getName()+" alarm is set to false. Exiting");
             return;
         }
-        Log.i(UtilityVariables.tag,this.getClass().getName()+" inside intent service now.");
+        //Log.i(UtilityVariables.tag,this.getClass().getName()+" inside intent service now.");
         try
         {
             this.mMonitoringUserNames = new ArrayList<>();
@@ -127,7 +122,7 @@ public class IntentServiceNotification extends IntentService
                 JSONArray jsonArray = jsonObject.getJSONArray("users");
                 if(jsonArray.length() == 0)
                 {
-                    Log.i(UtilityVariables.tag,this.getClass().getName()+ "not monitoring any users");
+                    //Log.i(UtilityVariables.tag,this.getClass().getName()+ "not monitoring any users");
                 }
                 else
                 {
@@ -135,7 +130,7 @@ public class IntentServiceNotification extends IntentService
                     {
                         JSONObject userObject = jsonArray.getJSONObject(i);
                         mMonitoringUserNames.add(userObject.optString("username"));
-                        Log.i(UtilityVariables.tag,this.getClass().getName()+"  monitoring users:"+userObject.optString("username"));
+                        //Log.i(UtilityVariables.tag,this.getClass().getName()+"  monitoring users:"+userObject.optString("username"));
 
                     }
                 }
@@ -147,7 +142,7 @@ public class IntentServiceNotification extends IntentService
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,this.getClass().getName()+"Exception getAllMonitoringUsers function "+e.toString());
+            Log.i(UtilityVariables.tag,this.getClass().getName()+"Exception getAllMonitoringUsers function: "+e.toString()+" class: "+this.getClass().getName());
         }
 
 
@@ -172,7 +167,7 @@ public class IntentServiceNotification extends IntentService
             while(foundLast == false)
             {
                 try {
-                    Log.i(UtilityVariables.tag,"getting posts for user: "+mMonitoringUserNames.get(i)+"  "+urlString);
+                    Log.i(UtilityVariables.tag,"getting posts for user: "+mMonitoringUserNames.get(i)+" from url: "+urlString);
                     JSONObject jsonObject = UtilityFunctions.getJSonContentFromUrl(urlString);
                     jsonObject = jsonObject.getJSONObject("user");
                     String userid = jsonObject.optString("id");
@@ -260,6 +255,7 @@ public class IntentServiceNotification extends IntentService
 
     public void getCommentsForPosts()
     {
+
         UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_GETTING_COMMENTS;
         for (Map.Entry<String, MonitoringPost> entry : mPostsFromDB.entrySet())
         {
@@ -296,26 +292,29 @@ public class IntentServiceNotification extends IntentService
 
                     post.lastTimeChecked = String.valueOf(newLastTimeChecked); //setting the new last time checked
 
-                    if (newComments.size() > 0) {
+                    if (newComments.size() > 0)
+                    {
                         Collections.reverse(oldComments);
                         Collections.reverse(newComments);
                         Log.i(UtilityVariables.tag, "new comments found!:" + newComments.size() + " for post: " + post.postCode);
                         this.mNewCommentsForPost.put(postid, newComments);
                         this.mOldCommentsForPost.put(postid, oldComments);
                     }
+                    else
+                    {
+                        //Log.i(UtilityVariables.tag, "no new comments found!:" + newComments.size() + " for post: " + post.postCode);
+                    }
                 }
                 else
                 {
-                    Log.i(UtilityVariables.tag,"status was not ok: "+jsonObject.toString());
+                    Log.i(UtilityVariables.tag,"status was not ok while getting comments: "+jsonObject.toString());
                 }
 
             }catch (Exception e)
             {
-                Log.i(UtilityVariables.tag,"Exception, Intent service, getCommentsForPosts function: "+e.toString());
+                Log.i(UtilityVariables.tag,"Exception, Intent service, getCommentsForPosts function: "+e.toString()+" class "+this.getClass().getName());
             }
         }
-
-
 
         }
 
@@ -323,8 +322,8 @@ public class IntentServiceNotification extends IntentService
     public void classifyPosts()
     {
         UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_CLASSIFYING;
-        Log.i(UtilityVariables.tag," inside the classify posts function. total posts for which new comments were found:"+mNewCommentsForPost.size());
-        Log.i(UtilityVariables.tag,"___________________________________");
+        //Log.i(UtilityVariables.tag," inside the classify posts function. total posts for which new comments were found:"+mNewCommentsForPost.size());
+        //Log.i(UtilityVariables.tag,"___________________________________");
         for (Map.Entry<String, ArrayList<Comment>> entry : mNewCommentsForPost.entrySet())
         {
             String postid = entry.getKey();
@@ -408,7 +407,7 @@ public class IntentServiceNotification extends IntentService
 
                 }catch (Exception e)
                 {
-                    Log.i(UtilityVariables.tag,"exception while forming json object from comments. "+e.toString());
+                    Log.i(UtilityVariables.tag,"exception while forming json object from comments. in function sendNotificationDataToServer: "+e.toString());
                 }
 
             }
@@ -461,6 +460,7 @@ public class IntentServiceNotification extends IntentService
             if(feedbacks.size() > 0)
             {
                 this.mClassifier.updateClassifier(feedbacks);
+                this.isClassifierUpdated = true;
                 for(int i=0; i< feedbacks.size();i++)
                 {
                     try {
@@ -476,25 +476,26 @@ public class IntentServiceNotification extends IntentService
 
                         if (resultjson.optString("success").toString().equals("success"))
                         {
-                            Log.i(UtilityVariables.tag,"adding feedback success: "+this.getClass().getName());
+                            //Log.i(UtilityVariables.tag,"adding feedback success: "+this.getClass().getName());
                             long s =mNotificationFeedbackDao.deleteFeedback(UtilityVariables.USER_EMAIL,feedbacks.get(i).getmNotificationId());
-                            Log.i(UtilityVariables.tag, "feedback was deleted: "+s);
+                            //Log.i(UtilityVariables.tag, "feedback was deleted: "+s);
                         }
                         else
                         {
-                            Log.i(UtilityVariables.tag,"adding feedback failed: "+this.getClass().getName());
+                            Log.i(UtilityVariables.tag,"adding feedback failed in updateClassifier function : "+this.getClass().getName());
                         }
 
                     }catch (Exception e)
                     {
-                        Log.i(UtilityVariables.tag,"Exception in updateClassifier function sending data to server : "+e.toString());
+                        Log.i(UtilityVariables.tag,"Exception in updateClassifier function sending data to server : "+e.toString()+" class: "+this.getClass().getName());
                     }
                 }
 
             }
             else
             {
-                Log.i(UtilityVariables.tag, "No feedbacks found!");
+                //Log.i(UtilityVariables.tag, "No feedbacks found!");
+                this.isClassifierUpdated = false;
             }
         }catch (Exception e)
         {
@@ -536,17 +537,20 @@ public class IntentServiceNotification extends IntentService
                 Log.i(UtilityVariables.tag,this.getClass().getName()+ "Something went wrong when trying to get feedback count from the server: "+jsonObject.toString());
             }
 
-            float condition = (float)feedbackCount / (float) notificationCount;
+            float condition = 0;
+
+            if (notificationCount != 0)
+                condition = (float)feedbackCount / (float) notificationCount;
 
 
 
-            if(condition < 0.5 || notificationCount == 0)
+            if(condition < 0.05)
             {
                 Log.i(UtilityVariables.tag,"not enough feedback. general classifier will be applied");
                 urlString = UtilityVariables.INSTAGRAM_GET_CLAFFISIER;
-                Log.i(UtilityVariables.tag,urlString);
+                //Log.i(UtilityVariables.tag,urlString);
                 jsonObject = UtilityFunctions.getJsonStringFromGetRequestUrlString(urlString);
-                Log.i(UtilityVariables.tag,"getting classifier general from server: "+jsonObject.toString());
+                //Log.i(UtilityVariables.tag,"getting classifier general from server: "+jsonObject.toString());
                 success = jsonObject.optString("success");
                 if(success.equals("success"))
                 {
@@ -556,12 +560,20 @@ public class IntentServiceNotification extends IntentService
                         Log.i(UtilityVariables.tag,weightArray.toString());
                         JSONObject weights = weightArray.getJSONObject(0);
                         double[] coefficients = new double[4];
-                        coefficients[0] = Double.parseDouble(weights.optString("interceptWeight"));
-                        coefficients[1] = Double.parseDouble(weights.optString("negativeCommentCountWeight"));
-                        coefficients[2] = Double.parseDouble(weights.optString("negativeCommentPercentageWeight"));
-                        coefficients[3] = Double.parseDouble(weights.optString("negativeWordPerNegativeCommentWeight"));
-                        this.mClassifier.setCoefficients(coefficients);
-                        Log.i(UtilityVariables.tag, "classifier is updated to the general classifier.");
+                        try
+                        {
+                            coefficients[0] = Double.parseDouble(weights.optString("interceptWeight"));
+                            coefficients[1] = Double.parseDouble(weights.optString("negativeCommentCountWeight"));
+                            coefficients[2] = Double.parseDouble(weights.optString("negativeCommentPercentageWeight"));
+                            coefficients[3] = Double.parseDouble(weights.optString("negativeWordPerNegativeCommentWeight"));
+                            this.mClassifier.setCoefficients(coefficients);
+                            Log.i(UtilityVariables.tag, "classifier is updated to the general classifier.");
+                        }
+                        catch(Exception e)
+                        {
+                            Log.i(UtilityVariables.tag, "No general classifier yet. The app will retain the device's resident classifier. "+e.toString());
+                        }
+
                     }
                     else
                     {
@@ -571,28 +583,31 @@ public class IntentServiceNotification extends IntentService
             }
             else
             {
-                Log.i(UtilityVariables.tag," enough feedbacks. send this classifier to the server.");
-                JSONObject data = new JSONObject();
-                data.put("interceptWeight",this.mClassifier.getCoefficients()[0]);
-                data.put("negativeCommentCountWeight",this.mClassifier.getCoefficients()[1]);
-                data.put("negativeCommentPercentageWeight",this.mClassifier.getCoefficients()[2]);
-                data.put("negativeWordPerNegativeCommentWeight",this.mClassifier.getCoefficients()[3]);
-
-
-
-                urlString = UtilityVariables.INSTAGRAM_ADD_CLAFFISIER;
-                JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
-                String message = resultjson.optString("message").toString();
-
-                if (resultjson.optString("success").toString().equals("success"))
+                if(this.isClassifierUpdated)
                 {
-                    Log.i(UtilityVariables.tag,"adding classifier success: "+this.getClass().getName());
+                    Log.i(UtilityVariables.tag, " enough feed backs. sending this classifier to the server.");
+                    JSONObject data = new JSONObject();
+                    data.put("interceptWeight", this.mClassifier.getCoefficients()[0]);
+                    data.put("negativeCommentCountWeight", this.mClassifier.getCoefficients()[1]);
+                    data.put("negativeCommentPercentageWeight", this.mClassifier.getCoefficients()[2]);
+                    data.put("negativeWordPerNegativeCommentWeight", this.mClassifier.getCoefficients()[3]);
+                    this.isClassifierUpdated = false;
+                    urlString = UtilityVariables.INSTAGRAM_ADD_CLAFFISIER;
+                    JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
+
+                    if (resultjson.optString("success").toString().equals("success"))
+                    {
+                        //Log.i(UtilityVariables.tag,"adding classifier success: "+this.getClass().getName());
+                    }
+                    else
+                    {
+                        Log.i(UtilityVariables.tag,"adding classifier failed: "+this.getClass().getName()+" json: "+resultjson.toString());
+                    }
                 }
                 else
                 {
-                    Log.i(UtilityVariables.tag,"adding classifier failed: "+this.getClass().getName());
+                    Log.i(UtilityVariables.tag, " this updated classifier has already been sent to the server once");
                 }
-
             }
 
         }catch (Exception e)
@@ -608,7 +623,7 @@ public class IntentServiceNotification extends IntentService
     {
         try
         {
-            Log.i(UtilityVariables.tag, "checkInstagramNotification function ");
+            Log.i(UtilityVariables.tag,"*********************************************************************");
             updateClassifier();
             getAllMonitoringUsers();
             getAllPostsFromDatabase();
@@ -617,10 +632,14 @@ public class IntentServiceNotification extends IntentService
             getCommentsForPosts();
             classifyPosts();
             sendNotificationDataToServer();
-            createNotification(getApplicationContext(),"Possible Bullying!!","On Instagram!!"+this.mInstagramBullyingInstance+" instances","Possible Bullying!");
+            createNotification(getApplicationContext(),"Possible Bullying!!","On Instagram!!"+
+                    this.mInstagramBullyingInstance+" instances","Possible Bullying!");
             updateMonitoringPostTable();
             universalClassifierUpdate();
             UtilityVariables.APP_STATUS = UtilityVariables.APP_STATUS_WAITING;
+            Log.i(UtilityVariables.tag,"*********************************************************************");
+
+
 
         }catch (Exception e)
         {

@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        UtilityVariables.IS_ALARM_ON = false;
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -321,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 message = resultjson.optString("message");
                 if (resultjson.optString("success").equals("success"))
                 {
-                    Log.i(UtilityVariables.tag,"login credentials matched: "+this.getClass().getName());
+                    //Log.i(UtilityVariables.tag,"login credentials matched: "+this.getClass().getName());
                     return true;
                 }
                 else

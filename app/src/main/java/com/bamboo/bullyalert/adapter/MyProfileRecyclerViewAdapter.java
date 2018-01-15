@@ -77,7 +77,7 @@ public class MyProfileRecyclerViewAdapter extends RecyclerView.Adapter<MyProfile
 
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception in onBindViewHolder: "+e.toString());
+            Log.i(UtilityVariables.tag,"Exception in "+this.getClass().getName()+" onBindViewHolder: "+e.toString());
         }
     }
 
@@ -107,7 +107,6 @@ public class MyProfileRecyclerViewAdapter extends RecyclerView.Adapter<MyProfile
         /*@Override
         public void onClick(View v)
         {
-            // TODO: 10/23/2017 go to profile details fragment
             Log.i(UtilityVariables.tag,"Clicked profile username: "+mTextViewUserName.getText().toString());
             mListener.onListFragmentInteraction(holder.mItem);
         }*/

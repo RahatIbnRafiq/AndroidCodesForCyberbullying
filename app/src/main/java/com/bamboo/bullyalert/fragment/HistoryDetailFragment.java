@@ -1,46 +1,23 @@
 package com.bamboo.bullyalert.fragment;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bamboo.bullyalert.R;
-import com.bamboo.bullyalert.UtilityPackage.UtilityFunctions;
-import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
-import com.bamboo.bullyalert.adapter.MyHistoryDetailRecyclerViewAdapter;
+
 import com.bamboo.bullyalert.model.History;
 import com.bamboo.bullyalert.model.HistoryDetail;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class HistoryDetailFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_NAME = "name";
-    // TODO: Customize parameters
     private String mName = "";
     private OnListFragmentInteractionListener mListener;
 
@@ -65,7 +42,6 @@ public class HistoryDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            //mName = getArguments().getString(ARG_NAME);
             mHistory = (History) getArguments().getSerializable(ARG_NAME);
         }
     }
@@ -82,7 +58,6 @@ public class HistoryDetailFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
                 LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
-        //populateHistoryDetails();
         return view;
     }
 
@@ -109,7 +84,6 @@ public class HistoryDetailFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(HistoryDetail item);
     }
 

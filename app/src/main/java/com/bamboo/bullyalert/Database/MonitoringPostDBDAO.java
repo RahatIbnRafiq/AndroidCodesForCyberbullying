@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class MonitoringPostDBDAO
 {
-
     protected SQLiteDatabase database;
     private DataBaseHelper dbHelper;
     private Context mContext;
@@ -19,7 +18,6 @@ public class MonitoringPostDBDAO
         this.mContext = context;
         dbHelper = DataBaseHelper.getHelper(mContext);
         open();
-
     }
 
     public void open() throws SQLException

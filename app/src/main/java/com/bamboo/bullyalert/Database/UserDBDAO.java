@@ -18,7 +18,6 @@ public class UserDBDAO
         this.mContext = context;
         dbHelper = DataBaseHelper.getHelper(mContext);
         open();
-
     }
 
     public void open() throws SQLException

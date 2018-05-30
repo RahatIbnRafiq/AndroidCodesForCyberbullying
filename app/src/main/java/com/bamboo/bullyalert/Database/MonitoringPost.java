@@ -1,6 +1,5 @@
 package com.bamboo.bullyalert.Database;
 
-import java.io.Serializable;
 
 /**
  * Created by Rahat Ibn Rafiq on 10/25/2017.
@@ -8,7 +7,6 @@ import java.io.Serializable;
 
 public class MonitoringPost
 {
-
     public String email;
     public String username;
     public String userid;

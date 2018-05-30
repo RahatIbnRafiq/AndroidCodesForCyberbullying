@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.fragment.SettingFragment.OnListFragmentInteractionListener;
 import com.bamboo.bullyalert.model.Setting;
-
 import java.util.List;
 
 public class MySettingRecyclerViewAdapter extends RecyclerView.Adapter<MySettingRecyclerViewAdapter.ViewHolder> {
@@ -26,8 +24,7 @@ public class MySettingRecyclerViewAdapter extends RecyclerView.Adapter<MySetting
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_setting, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_setting, parent, false);
         return new ViewHolder(view);
     }
 
@@ -46,13 +43,10 @@ public class MySettingRecyclerViewAdapter extends RecyclerView.Adapter<MySetting
             holder.mOptionTwoView.setVisibility(View.GONE);
             holder.mInfoView.setText(mValues.get(position).info);
         }
-
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
             }

@@ -14,6 +14,7 @@ public class User
         this.email = email;
         this.instagramToken = instagramToken;
     }
+
     public User()
     {
         this.email = null;

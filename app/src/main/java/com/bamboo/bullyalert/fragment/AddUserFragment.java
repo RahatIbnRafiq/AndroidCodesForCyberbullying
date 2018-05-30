@@ -20,23 +20,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import org.jsoup.Jsoup;
 import com.bamboo.bullyalert.NavigationActivity;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityFunctions;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.adapter.MyAddUserRecyclerViewAdapter;
 import com.bamboo.bullyalert.model.AddUser;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import org.jsoup.nodes.DataNode;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,22 +40,13 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private OnListFragmentInteractionListener mListListener;
-
-
     private String mSocialNetworkName;
     private EditText mEditTextUserToBeSearched;
     private Button mMonitorButton;
-
-
     private RecyclerView mRecyclerView;
     private List<AddUser>mListUserSearch;
     private RecyclerView.Adapter mUserSearchResultAdapter;
-
-
     private ProgressDialog mProgressDialog ;
-
-
-
     private Context mContext;
 
     public AddUserFragment()
@@ -67,10 +54,10 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
     }
 
     //@SuppressWarnings("unused")
-    public static AddUserFragment newInstance(int columnCount) {
+    public static AddUserFragment newInstance() {
         AddUserFragment fragment = new AddUserFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,67 +65,44 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        if (getArguments() != null) {
-            int mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }*/
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_add_user_page, container, false);
         this.mContext = view.getContext();
-
-
         mProgressDialog = new ProgressDialog(mContext);
-
-
         Button mUserSearchButton = (Button) view.findViewById(R.id.searchButton);
         mMonitorButton = (Button)view.findViewById(R.id.monitorButton);
         mEditTextUserToBeSearched = (EditText)view.findViewById(R.id.edittext_username);
-
-
         mUserSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 UserSearch();
             }
         });
-
         mMonitorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performMonitoringRequestFunction();
             }
         });
-
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                R.array.social_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext, R.array.social_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
-
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                LinearLayoutManager.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
-
-
         mMonitorButton = (Button)view.findViewById(R.id.monitorButton);
         mRecyclerView.setVisibility(View.GONE);
         mMonitorButton.setVisibility(View.GONE);
-
-
-
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -151,21 +115,15 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
         mListListener = null;
     }
 
-
-
     private void performMonitoringRequestFunction()
     {
-
         PerformMonitoringRequest performMonitoringRequest = new PerformMonitoringRequest();
         performMonitoringRequest.execute((Void) null);
     }
 
-
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         this.mSocialNetworkName = parent.getItemAtPosition(position).toString();
-        //Log.i(UtilityVariables.tag,"social network selected: "+this.mSocialNetworkName);
     }
 
     @Override
@@ -175,7 +133,6 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
     public interface OnListFragmentInteractionListener
     {
-        //void onListFragmentInteraction(AddUser.Item item);
     }
 
     private void UserSearch()
@@ -187,6 +144,83 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
 
     }
 
+    private class JsoupAsyncTask extends AsyncTask<Void, Void, Boolean> {
+        String usernameToSearch;
+        ProgressDialog dialog;
+        Context context;
+        AddUser user;
+        public JsoupAsyncTask(String usernameToSearch,ProgressDialog dialog, Context context) {
+            super();
+            this.usernameToSearch = usernameToSearch;
+            this.dialog = dialog;
+            this.context = context;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                Document doc;
+                String htmlPageUrl = "https://www.instagram.com/"+this.usernameToSearch+"/";
+                doc = Jsoup.connect(htmlPageUrl).get();
+                Elements scriptElements = doc.getElementsByTag("script");
+                for (Element element :scriptElements ){
+                    for (DataNode node : element.dataNodes())
+                    {
+                        if(node.getWholeData().toString().contains("window._sharedData"))
+                        {
+                            String data = node.getWholeData().toString();
+                            data = data.substring(data.indexOf("{"));
+                            JSONObject obj = new JSONObject(data);
+                            JSONArray objArray = obj.getJSONObject("entry_data").getJSONArray("ProfilePage");
+                            JSONObject jsonObject = objArray.getJSONObject(0).getJSONObject("graphql").getJSONObject("user");
+                            String username = jsonObject.optString("username");
+                            String user_id = jsonObject.optString("id");
+                            String urlProfilePicture = jsonObject.optString("profile_pic_url");
+                            String website = "";
+                            String full_name = jsonObject.optString("full_name");
+                            String bio = jsonObject .optString("biography");
+                            this.user = new AddUser(user_id,username,urlProfilePicture,false,full_name,bio,website);
+                            return true;
+
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(UtilityVariables.tag, "Exception while parsing: "+e.toString()+"class: "+this.getClass().getName());
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            this.dialog.dismiss();
+            if(result.booleanValue() == false)
+            {
+                Toast.makeText(this.context,"No user found. Try with a different username please.",Toast.LENGTH_SHORT).show();
+                if(mListUserSearch != null)
+                    mListUserSearch.clear();
+                if (mUserSearchResultAdapter != null)
+                    mUserSearchResultAdapter.notifyDataSetChanged();
+            }
+            else
+            {
+                mListUserSearch = new ArrayList<>();
+                mListUserSearch.add(this.user);
+                mUserSearchResultAdapter = new MyAddUserRecyclerViewAdapter(mListUserSearch,mListListener,this.context);
+                mRecyclerView.setAdapter(mUserSearchResultAdapter);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mMonitorButton.setVisibility(View.VISIBLE);
+                Log.i(UtilityVariables.tag, "user added to the user-search list UI: "+this.user.getmUserId());
+            }
+
+        }
+    }
+
 
     private void getUserSearchResultByUserName(String username)
     {
@@ -195,74 +229,16 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
         progressDialog.show();
         if(this.mSocialNetworkName.equals("Instagram"))
         {
-            String urlString = UtilityVariables.INSTAGRAM_API_USER_SEARCH+username+"/?__a=1";
-            Log.i(UtilityVariables.tag,"Searching for user using this url now: "+urlString);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET,
-                    urlString,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            progressDialog.dismiss();
-                            mListUserSearch = new ArrayList<>();
-                            //Log.i(UtilityVariables.tag,"onResponse function add user fragment: "+response);
-                            try
-                            {
-                                JSONObject jsonObject = new JSONObject(response);
-                                jsonObject = jsonObject.getJSONObject("user");
-                                String username = jsonObject.optString("username");
-                                String user_id = jsonObject.optString("id");
-                                String urlProfilePicture = jsonObject.optString("profile_pic_url");
-                                String website = "";
-                                String full_name = jsonObject.optString("full_name");
-                                String bio = jsonObject .optString("biography");
-                                AddUser user = new AddUser(user_id,username,urlProfilePicture,false,full_name,bio,website);
-                                mListUserSearch.add(user);
-
-                                mUserSearchResultAdapter = new MyAddUserRecyclerViewAdapter(mListUserSearch,mListListener,mContext);
-                                mRecyclerView.setAdapter(mUserSearchResultAdapter);
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                                mMonitorButton.setVisibility(View.VISIBLE);
-
-
-                            }
-                            catch (Exception e)
-                            {
-                                Log.i(UtilityVariables.tag, "exception while parsing json array in showUserSearchResult: "+e.toString()+"class: "+this.getClass().getName());
-                                progressDialog.dismiss();
-                                mListUserSearch.clear();
-                                mUserSearchResultAdapter.notifyDataSetChanged();
-                                Toast.makeText(mContext,"No user found. Try with a different username please.",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-                            progressDialog.dismiss();
-                            mListUserSearch.clear();
-                            mUserSearchResultAdapter.notifyDataSetChanged();
-                            Log.i(UtilityVariables.tag,error.toString()+" in function showUSerSearchResult class "+this.getClass().getName());
-                            Toast.makeText(mContext,"No user found. Try with a different username please.",Toast.LENGTH_SHORT).show();
-
-                        }
-                    });
-            RequestQueue requestQueue = Volley.newRequestQueue(mContext);
-            requestQueue.add(stringRequest);
+            JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask(username,progressDialog,this.mContext);
+            jsoupAsyncTask.execute();
         }
     }
 
     private class PerformMonitoringRequest extends AsyncTask<Void, Void, Boolean>
     {
-
         String mMessage;
-
-
-
         PerformMonitoringRequest() {
-
         }
-
         protected Boolean doInBackground(Void... params)
         {
             try {
@@ -282,11 +258,8 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                         array.put(j,temp);
                         j+=1;
                     }
-
                 }
                 data.put("data",array);
-                //Log.i(UtilityVariables.tag,"debugging error in PerformMonitoringRequest inner class: "+data.toString()+" in class "+this.getClass().getName());
-
                 String urlString = UtilityVariables.INSTAGRAM_MONITOR_USER_SERVER;
                 JSONObject resultjson = UtilityFunctions.getJsonStringFromPostRequestUrlString(urlString,data);
                 if(resultjson != null && resultjson.optString("message") != null && resultjson.optString("success") != null)
@@ -299,12 +272,9 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                 {
                     return false;
                 }
-
-
-
             }catch (Exception e)
             {
-                Log.i(UtilityVariables.tag,e.toString()+" in performMonitoringRequest in class "+this.getClass().getName());
+                Log.e(UtilityVariables.tag,e.toString()+" in performMonitoringRequest in class "+this.getClass().getName());
                 return false;
             }
         }
@@ -326,16 +296,13 @@ public class AddUserFragment extends Fragment implements AdapterView.OnItemSelec
                 {
                     Toast.makeText(mContext, "Please make sure the internet is on", Toast.LENGTH_SHORT).show();
                 }
-
             }
-
             if (success)
             {
                 Log.i(UtilityVariables.tag,"User has been inserted successfully in the server database");
                 Intent intent = new Intent(mContext, NavigationActivity.class);
                 startActivity(intent);
             }
-
         }
 
         @Override

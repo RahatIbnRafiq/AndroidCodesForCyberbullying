@@ -3,11 +3,6 @@ package com.bamboo.bullyalert.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
-
-import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +12,8 @@ import java.util.Map;
 
 public class MonitoringPostDAO extends MonitoringPostDBDAO
 {
-
     public MonitoringPostDAO(Context context)
     {
-
         super(context);
     }
 
@@ -36,7 +29,6 @@ public class MonitoringPostDAO extends MonitoringPostDBDAO
         values.put(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE, post.postCode);
         return database.insert(DataBaseHelper.MONITORING_POSTS_TABLE, null, values);
     }
-
 
     public void updateLastTimeCheckedForPosts(HashMap<String,MonitoringPost> mPostsFromDB)
     {
@@ -54,19 +46,14 @@ public class MonitoringPostDAO extends MonitoringPostDBDAO
                         values,
                         DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_POSTID + " = ? AND " + DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_EMAIL + " = ?",
                         new String[]{postid, email});
-                //Log.i(UtilityVariables.tag,"result of updating the db with last time checked: "+result);
             }
-
         }
     }
-
 
     public HashMap<String,MonitoringPost> fetchAllMonitoringPostsByEmail(String email)
     {
         HashMap<String,MonitoringPost> postMap = new HashMap<>();
-        String sql = "SELECT * FROM " + DataBaseHelper.MONITORING_POSTS_TABLE
-                + " WHERE " + DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_EMAIL + " = ?";
-
+        String sql = "SELECT * FROM " + DataBaseHelper.MONITORING_POSTS_TABLE + " WHERE " + DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_EMAIL + " = ?";
         Cursor cursor = database.rawQuery(sql, new String[] { email + "" });
         if(cursor != null)
         {
@@ -82,14 +69,9 @@ public class MonitoringPostDAO extends MonitoringPostDBDAO
                     post.socialNetwork = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_SOCIAL_NETWORK));
                     post.postCode = cursor.getString(cursor.getColumnIndex(DataBaseHelper.MONITORING_POSTS_TABLE_COLUMN_PSOT_CODE));
                     postMap.put(post.postid,post);
-                    //Log.i(UtilityVariables.tag,"postid:  in db right now: "+post.postid+"  email:"+post.email);
-
                 }while(cursor.moveToNext());
             }
         }
         return postMap;
-
     }
-
-
 }

@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -15,11 +14,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bamboo.bullyalert.IntentServices.IntentServiceNotification;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
@@ -100,25 +97,13 @@ public class NavigationActivity extends AppCompatActivity
     {
         if(UtilityVariables.IS_ALARM_ON == false)
         {
-            //Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is set to true now.");
             mNotificationIntent = new Intent(this, IntentServiceNotification.class);
             mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mPendingNotificationIntent = PendingIntent.getService(this, 1, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            //Calendar calendar = Calendar.getInstance();
-            //alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime, PendingIntent.getService(this, 1, notificationIntent,
-                    //PendingIntent.FLAG_UPDATE_CURRENT));
-
             mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                     UtilityVariables.ALARM_INTERVAL, mPendingNotificationIntent);
-            //mAlarmManager.set(AlarmManager.RTC_WAKEUP,5000,mPendingNotificationIntent);
-
             UtilityVariables.IS_ALARM_ON = true;
         }
-        else
-        {
-            //Log.i(UtilityVariables.tag, ": Inside setAlarm function. alarm is already set");
-        }
-
     }
 
 
@@ -193,7 +178,7 @@ public class NavigationActivity extends AppCompatActivity
 
         if (id == R.id.add_new_profile) {
             toolbar.setTitle(R.string.add_new_profile);
-            fragment = AddUserFragment.newInstance(1);
+            fragment = AddUserFragment.newInstance();
         } else if (id == R.id.check_notifications) {
             toolbar.setTitle(R.string.check_notification);
             fragment = NotificationFragment.newInstance(null);

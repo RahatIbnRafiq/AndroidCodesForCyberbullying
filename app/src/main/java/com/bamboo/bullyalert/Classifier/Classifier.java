@@ -4,15 +4,12 @@ package com.bamboo.bullyalert.Classifier;
  * Created by Rahat Ibn Rafiq on 10/26/2017.
  */
 
-
 import android.content.Context;
 import android.util.Log;
-
 import com.bamboo.bullyalert.Database.NotificationFeedback;
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.model.Comment;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,16 +17,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-
 public class Classifier {
     private static final int EPOCH = 1000;
-    private static final double LEARNING_RATE = 0.01;
+    private static final double LEARNING_RATE = 0.0001;
     private static final int BOOTSTRAP_VARIABLE = 5;
-
     private static Classifier instance = null;
     private static ArrayList<String> negativeWordList;
     private ArrayList<ClassifierTrainingData> trainingDataList;
-
     private double [] coefficients;
 
     private Classifier(Context context) throws Exception
@@ -37,17 +31,14 @@ public class Classifier {
         InputStream is = context.getResources().openRawResource(R.raw.negative_words_list);
         Classifier.negativeWordList = new ArrayList<>();
         loadNegativeWords(is);
-
         this.trainingDataList = new ArrayList<>();
         is = context.getResources().openRawResource(R.raw.training_data_for_android);
         loadTrainingData(is);
-
         this.coefficients = new double[4];
         this.coefficients[0]= -0.878;
         this.coefficients[1]= 0.00277;
         this.coefficients[2]= 2.0747;
         this.coefficients[3]= 2.0639;
-
     }
 
 
@@ -67,7 +58,6 @@ public class Classifier {
             yhat += (this.coefficients[i]*featureValues[i]);
         }
         return 1/(1+Math.exp(-1*yhat));
-
     }
 
     public double[] getFeatureValues(ArrayList<Comment>comments)
@@ -95,7 +85,6 @@ public class Classifier {
                 negativeCommentCount++;
 
         }
-
         double negativeCommentPercentage = (negativeCommentCount)/(comments.size());
         if(negativeCommentCount > 0)
             negativeWordPerNegativeComment = (totalNegativeWord)/(negativeCommentCount);
@@ -106,24 +95,17 @@ public class Classifier {
         return featureValues;
     }
 
-
-
-
     private void loadNegativeWords(InputStream is) throws IOException {
 
         if (is != null) {
             String line;
-
             try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
-
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 while ((line = reader.readLine()) != null) {
                     if (!Classifier.negativeWordList.contains(line)) {
                         Classifier.negativeWordList.add(line);
                     }
                 }
-
                 reader.close();
             }
             finally {
@@ -131,7 +113,7 @@ public class Classifier {
                     is.close();
                 }catch (IOException ex)
                 {
-                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class loadNegativeWords function."+ex.toString());
+                    Log.e(UtilityVariables.tag,"IO Exception in Classifier class loadNegativeWords function."+ex.toString());
                 }
 
             }
@@ -141,11 +123,8 @@ public class Classifier {
     private void loadTrainingData(InputStream is) throws IOException {
         if (is != null) {
             String line;
-
             try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
-
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 while ((line = reader.readLine()) != null) {
                     String []tokens = line.split(",");
                     ClassifierTrainingData tr = new ClassifierTrainingData();
@@ -156,7 +135,6 @@ public class Classifier {
                     tr.truePrediction = Double.parseDouble(tokens[3]);
                     this.trainingDataList.add(tr);
                 }
-
                 reader.close();
             }
             finally {
@@ -164,12 +142,11 @@ public class Classifier {
                     is.close();
                 }catch (IOException ex)
                 {
-                    Log.i(UtilityVariables.tag,"IO Exception in Classifier class loadTrainingData function: "+ex.toString());
+                    Log.e(UtilityVariables.tag,"IO Exception in Classifier class loadTrainingData function: "+ex.toString());
                 }
             }
         }
     }
-
 
     public void updateClassifier(ArrayList<NotificationFeedback> feedbacks)
     {
@@ -189,7 +166,6 @@ public class Classifier {
                 for (String comment : comments) {
                     commentList.add(new Comment(comment, "", 0));
                 }
-
                 tr.featurevalues = this.getFeatureValues(commentList);
                 int f = Integer.parseInt(feedback.mFeedback);
                 double p = Double.parseDouble(feedback.getmPredicted());
@@ -197,7 +173,6 @@ public class Classifier {
                 for(int j=0; j< BOOTSTRAP_VARIABLE;j++)
                     this.trainingDataList.add(tr);
             }
-
             for(int epoch=0;epoch<Classifier.EPOCH;epoch++)
             {
                 double sum_error = 0.0;
@@ -213,24 +188,15 @@ public class Classifier {
                     }
 
                 }
-                //Log.i(UtilityVariables.tag,"Updating classifier: epoch: "+epoch+" sum error: "+sum_error);
-
             }
-
-
-
-
         }catch (Exception e)
         {
-            Log.i(UtilityVariables.tag,"Exception: "+this.getClass().getName()+" updateClassifier function: "+e.toString());
+            Log.e(UtilityVariables.tag,"Exception: "+this.getClass().getName()+" updateClassifier function: "+e.toString());
         }
-
         for (double coefficient : this.coefficients) {
             Log.i(UtilityVariables.tag, " after updating coefficients: " + coefficient);
-
         }
     }
-
 
     public static Classifier getInstance(Context context) throws Exception
     {

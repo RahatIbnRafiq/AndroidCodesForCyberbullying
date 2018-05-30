@@ -10,8 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class NotificationFeedbackDBDAO
 {
-
-
     protected SQLiteDatabase database;
     private DataBaseHelper dbHelper;
     private Context mContext;
@@ -20,8 +18,8 @@ public class NotificationFeedbackDBDAO
         this.mContext = context;
         dbHelper = DataBaseHelper.getHelper(mContext);
         open();
-
     }
+
     public void open() throws SQLException
     {
         if(dbHelper == null)

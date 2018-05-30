@@ -7,12 +7,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.fragment.NotificationFragment.OnListFragmentInteractionListener;
 import com.bamboo.bullyalert.model.Notification;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,7 +27,6 @@ class   CustomComparator implements Comparator<Notification> {
 
 public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNotificationRecyclerViewAdapter.ViewHolder> {
     private final OnListFragmentInteractionListener mListener;
-
     private final ArrayList<Notification> mNotificationList;
 
     public MyNotificationRecyclerViewAdapter(ArrayList<Notification> notifications, OnListFragmentInteractionListener listener)
@@ -70,30 +67,23 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
                 textLevel = "medium";
             }
             holder.mLevel.setText(textLevel);
-
-
             holder.mView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    //Log.i(UtilityVariables.tag,"clicked username: "+notif.getmPostId());
                     if (null != mListener)
                     {
                         mListener.onListFragmentInteraction(notif);
-
                     }
                 }
             });
-
             holder.mView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
                 @Override
                 public boolean onGenericMotion(View v, MotionEvent event) {
                     return false;
                 }
             });
-
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception in "+this.getClass().getName()+" onBindViewHolder function: "+e.toString());
@@ -113,7 +103,6 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
         private TextView mUserName;
         private TextView mSocialNetwork;
 
-
         public ViewHolder(View view)
         {
             super(view);
@@ -121,7 +110,6 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
             mLevel = (TextView)itemView.findViewById(R.id.probability);
             mUserName = (TextView)itemView.findViewById(R.id.username);
             mSocialNetwork = (TextView)itemView.findViewById(R.id.socialNetwork);
-
         }
     }
 }

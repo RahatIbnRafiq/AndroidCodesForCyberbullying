@@ -12,41 +12,30 @@ import com.bamboo.bullyalert.fragment.NotificationDetailFragment.OnListFragmentI
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.model.Comment;
 import com.bamboo.bullyalert.model.NotificationDetail;
-
 import java.util.ArrayList;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link NotificationDetail.Item} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- */
 public class MyNotificationDetailRecyclerViewAdapter extends RecyclerView.Adapter<MyNotificationDetailRecyclerViewAdapter.ViewHolder>
 {
     private final OnListFragmentInteractionListener mListener;
-
     private ArrayList<Comment> mCommentList;
 
     public MyNotificationDetailRecyclerViewAdapter(ArrayList<Comment> commentList, OnListFragmentInteractionListener listener)
     {
         mCommentList = commentList;
         mListener = listener;
-
     }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         try
         {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_notification_detail, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_notification_detail, parent, false);
             return new ViewHolder(view);
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception in "+this.getClass().getName()+" onCreateViewHolder fucntion: "+e.toString());
             return null;
         }
-
     }
 
     @Override
@@ -55,22 +44,18 @@ public class MyNotificationDetailRecyclerViewAdapter extends RecyclerView.Adapte
         try {
             holder.mPersonView.setText(mCommentList.get(position).getmCommenterName());
             holder.mCommentView.setText(mCommentList.get(position).getmCommentText());
-
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (null != mListener)
                     {
-
                     }
                 }
             });
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception in "+this.getClass().getName()+" onBindViewHolder function: "+e.toString());
         }
-
     }
 
     @Override

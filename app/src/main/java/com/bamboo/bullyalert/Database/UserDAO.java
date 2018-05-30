@@ -23,10 +23,8 @@ public class UserDAO extends UserDBDAO
         return database.insert(DataBaseHelper.USER_TABLE, null, values);
     }
 
-
     public long deleteUser(String email)
     {
-
         String table = DataBaseHelper.USER_TABLE;
         String whereClause = DataBaseHelper.USER_TABLE_COLUMN_EMAIL+"=?";
         String[] whereArgs = new String[] { email };
@@ -36,9 +34,7 @@ public class UserDAO extends UserDBDAO
     public User fetchUser(String email)
     {
         User user = null;
-        String sql = "SELECT * FROM " + DataBaseHelper.USER_TABLE
-                + " WHERE " + DataBaseHelper.USER_TABLE_COLUMN_EMAIL + " = ?";
-
+        String sql = "SELECT * FROM " + DataBaseHelper.USER_TABLE + " WHERE " + DataBaseHelper.USER_TABLE_COLUMN_EMAIL + " = ?";
         Cursor cursor = database.rawQuery(sql, new String[] { email + "" });
         if (cursor.moveToNext())
         {

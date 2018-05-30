@@ -14,27 +14,19 @@ import android.view.animation.Animation;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.fragment.AddUserFragment.OnListFragmentInteractionListener;
 import com.bamboo.bullyalert.model.AddUser;
 import com.squareup.picasso.Picasso;
-
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link } and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- */
 public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUserRecyclerViewAdapter.ViewHolder>
 {
-
     private List<AddUser>mListUserSearch;
     private OnListFragmentInteractionListener mListener;
     private Context mContext;
-
     private HashMap<String,AddUser> mToBeMonitoredUsersMap = new HashMap<>();
 
     public MyAddUserRecyclerViewAdapter(List<AddUser> listUserSearch, OnListFragmentInteractionListener listener,Context context)
@@ -62,20 +54,17 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
         {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_add_user,parent,false);
             return new ViewHolder(v);
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag, "Exception in onCreateViewHolder function in "+this.getClass().getName()+e.toString());
             return null;
         }
-
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         AddUser addUser = this.mListUserSearch.get(position);
-
         try
         {
             holder.mTextViewUserId.setText("User ID: "+addUser.getmUserId());
@@ -83,19 +72,13 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
             holder.mCheckedView.setChecked(addUser.ismChecked());
             holder.mTextViewFullName.setText("Full Name: "+addUser.getFullName());
             holder.mTextViewBio.setText("Bio: "+addUser.getBio());
-
             Picasso.with(mContext)
             .load(addUser.getmProfilePictureUrl())
             .into(holder.mImageViewProfilePicture);
-
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"Exception in onBindViewHolder function in : "+this.getClass().getName()+e.toString());
         }
-
-
-
     }
 
     @Override
@@ -105,17 +88,14 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-
         private int originalHeight = 0;
         private boolean isViewExpanded = false;
-
         private TextView mTextViewUserName;
         private TextView mTextViewUserId;
         private CheckBox mCheckedView;
         private ImageView mImageViewProfilePicture;
         private TextView mTextViewFullName;
         private TextView mTextViewBio;
-
         private CardView mVisibleCardView;
         private CardView mInVisibleCardView;
 
@@ -128,11 +108,9 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
             mImageViewProfilePicture = (ImageView)itemView.findViewById(R.id.profile_picture);
             mTextViewFullName = (TextView)itemView.findViewById(R.id.fullname);
             mTextViewBio = (TextView)itemView.findViewById(R.id.bio);
-
             mVisibleCardView = (CardView)itemView.findViewById(R.id.visibleCardView);
             mInVisibleCardView = (CardView)itemView.findViewById(R.id.invisibleCardView);
             itemView.setOnClickListener(this);
-
             mCheckedView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
@@ -144,9 +122,7 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
                     mToBeMonitoredUsersMap.get(username).setmChecked(mCheckedView.isChecked());
                 }
             });
-
             if (!isViewExpanded) {
-                // Set Views to View.GONE and .setEnabled(false)
                 mInVisibleCardView.setVisibility(View.GONE);
                 mInVisibleCardView.setEnabled(false);
             }
@@ -174,12 +150,10 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
                 Animation a = new AlphaAnimation(1.00f, 0.00f); // Fade out
 
                 a.setDuration(200);
-                // Set a listener to the animation and configure onAnimationEnd
                 a.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation)
                     {
-
                     }
 
                     @Override
@@ -191,11 +165,8 @@ public class MyAddUserRecyclerViewAdapter extends RecyclerView.Adapter<MyAddUser
                     @Override
                     public void onAnimationRepeat(Animation animation)
                     {
-
                     }
                 });
-
-                // Set the animation on the custom view
                 mInVisibleCardView.startAnimation(a);
             }
             valueAnimator.setDuration(200);

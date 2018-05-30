@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,10 +23,8 @@ import com.bamboo.bullyalert.R;
 import com.bamboo.bullyalert.UtilityPackage.UtilityVariables;
 import com.bamboo.bullyalert.adapter.MyProfileRecyclerViewAdapter;
 import com.bamboo.bullyalert.model.Profile;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,14 +33,10 @@ public class ProfileFragment extends Fragment
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private OnListFragmentInteractionListener mListener;
-
     private Context mContext;
     private RecyclerView mRecyclerView;
     private List<Profile> mListMonitoringUserProfiles;
-
-
     private ProgressDialog mProgressDialog ;
-
 
     public ProfileFragment() {
     }
@@ -59,43 +52,28 @@ public class ProfileFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /*if (getArguments() != null) {
-            int mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_page, container, false);
-
         this.mContext = view.getContext();
         mProgressDialog = new ProgressDialog(mContext);
-
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                LinearLayoutManager.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         mListMonitoringUserProfiles = new ArrayList<>();
-
         populateMonitoringUserProfilesFunction();
-
-
         return view;
     }
-
-
 
     private void populateMonitoringUserProfilesFunction()
     {
         PopulateMonitoringUserProfiles populateMonitoringUserProfiles = new PopulateMonitoringUserProfiles();
         populateMonitoringUserProfiles.execute((Void) null);
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -104,8 +82,7 @@ public class ProfileFragment extends Fragment
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener");
         }
     }
 
@@ -120,7 +97,6 @@ public class ProfileFragment extends Fragment
         void onListFragmentInteraction(Profile userProfile);
     }
 
-
     private void showMonitoringUserProfiles(JSONArray jsonArray)
     {
         try {
@@ -131,19 +107,15 @@ public class ProfileFragment extends Fragment
                 String userid = userObject.optString("userid");
                 String urlProfilePicture = "";
                 String socialNetwork = "Instagram";
-
                 Profile monitoringUserProfile = new Profile(userid,username,urlProfilePicture,socialNetwork);
                 mListMonitoringUserProfiles.add(monitoringUserProfile);
-
             }
             RecyclerView.Adapter mMonitoringUserProfilesAdapter = new MyProfileRecyclerViewAdapter(mListMonitoringUserProfiles, mListener, mContext);
             mRecyclerView.setAdapter(mMonitoringUserProfilesAdapter);
-
         }catch (Exception e)
         {
             Log.i(UtilityVariables.tag,"exception while parsing json array in showUserSearchResult: "+e.toString()+" class: "+this.getClass().getName());
         }
-
     }
 
     private void getMonitoringUsers()
@@ -172,15 +144,11 @@ public class ProfileFragment extends Fragment
                                     showMonitoringUserProfiles(jsonArray);
                                 }
                             }
-
-
                         }
                         catch (Exception e)
                         {
                             Toast.makeText(mContext,"Something bad happened!",Toast.LENGTH_SHORT).show();
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -192,23 +160,14 @@ public class ProfileFragment extends Fragment
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
         requestQueue.add(stringRequest);
-
-
     }
-
-
-
-
-
 
     private class PopulateMonitoringUserProfiles extends AsyncTask<Void, Void, Boolean>
     {
         PopulateMonitoringUserProfiles()
         {
         }
-
         protected Boolean doInBackground(Void... params) {
-
             try
             {
                 getMonitoringUsers();
@@ -230,8 +189,4 @@ public class ProfileFragment extends Fragment
 
         }
     }
-
-
-
-
 }

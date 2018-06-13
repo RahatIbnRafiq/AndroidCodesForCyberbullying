@@ -23,8 +23,9 @@ public class UtilityVariables {
 
     public static final int READ_TIMEOUT = 60*1000;
     public static final int CONNECTION_TIMEOUT = 60*1000;
-    public static final long ALARM_INTERVAL = 60*1000;
+    public static final long ALARM_INTERVAL = 4*60*60*1000;
     public static final int COMMENT_REQUEST_LIMIT = 100;
+    public static final double NOTIFICATION_LEVEL_HIGH = 0.4;
 
     public static final String INSTAGRAM_GET_MONITORING_USERS = ROOT_URL+"/api/guardian/instagram/getMonitoringUsers";
     public static final String INSTAGRAM_GET_NOTIFICATION_COUNT = ROOT_URL+"/api/notification/count";

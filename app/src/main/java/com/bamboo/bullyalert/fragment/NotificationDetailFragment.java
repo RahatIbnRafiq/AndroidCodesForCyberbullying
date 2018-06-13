@@ -29,8 +29,8 @@ public class NotificationDetailFragment extends Fragment {
     private Context mContext;
     public ArrayList<Comment> commentList;
     private Button mButtonSeeContext;
-    private Button mButtonRight;
-    private Button mButtonWrong;
+    private Button mButtonBullying;
+    private Button mButtonNotBullying;
     private NotificationFeedbackDAO mNotificationFeedbackDao;
 
     public NotificationDetailFragment() {
@@ -64,8 +64,8 @@ public class NotificationDetailFragment extends Fragment {
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         populateNotificationDetails();
         mButtonSeeContext = (Button) view.findViewById(R.id.button_see_context);
-        mButtonRight = (Button) view.findViewById(R.id.right);
-        mButtonWrong = (Button) view.findViewById(R.id.wrong);
+        mButtonBullying = (Button) view.findViewById(R.id.button_bullying);
+        mButtonNotBullying = (Button) view.findViewById(R.id.button_not_bullying);
         mButtonSeeContext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -79,27 +79,29 @@ public class NotificationDetailFragment extends Fragment {
         });
         if(mNotification.getmFeedBack() != -1)
         {
-            mButtonWrong.setEnabled(false);
-            mButtonRight.setEnabled(false);
+            mButtonBullying.setEnabled(false);
+            mButtonNotBullying.setEnabled(false);
         }
         else
         {
-            mButtonRight.setOnClickListener(new View.OnClickListener()
+            mButtonBullying.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    if(mNotification.getmFeedBack() == -1)
+                    if(mNotification.getmFeedBack() == -1) {
                         getFeedback(1);
+                    }
                 }
             });
-            mButtonWrong.setOnClickListener(new View.OnClickListener()
+            mButtonNotBullying.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    if(mNotification.getmFeedBack() == -1)
+                    if(mNotification.getmFeedBack() == -1) {
                         getFeedback(0);
+                    }
                 }
             });
         }

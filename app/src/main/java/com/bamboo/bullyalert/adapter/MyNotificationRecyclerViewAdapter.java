@@ -58,14 +58,14 @@ public class MyNotificationRecyclerViewAdapter extends RecyclerView.Adapter<MyNo
             holder.mUserName.setText(mNotificationList.get(position).getmUserName());
             holder.mSocialNetwork.setText(mNotificationList.get(position).getmSocialNetwork());
             String textLevel = "low";
-            if(mNotificationList.get(position).getmLevel() > 0.7)
+            if(mNotificationList.get(position).getmLevel() > UtilityVariables.NOTIFICATION_LEVEL_HIGH)
             {
                 textLevel = "high";
             }
-            else if(mNotificationList.get(position).getmLevel() > 0.4 &&  mNotificationList.get(position).getmLevel() < 0.7)
+            /*else if(mNotificationList.get(position).getmLevel() > 0.4 &&  mNotificationList.get(position).getmLevel() < 0.7)
             {
                 textLevel = "medium";
-            }
+            }*/
             holder.mLevel.setText(textLevel);
             holder.mView.setOnClickListener(new View.OnClickListener()
             {

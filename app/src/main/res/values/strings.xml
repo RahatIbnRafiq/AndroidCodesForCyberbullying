@@ -43,8 +43,8 @@
     <string name="ethnicity">Your Ethnicity(optional)</string>
     <string name="gender">Gender(optional)</string>
 
-    <string name="right">Right</string>
-    <string name="wrong">Wrong</string>
+    <string name="button_bullying">Its Bullying</string>
+    <string name="button_not_bullying">Not Bullying</string>
     <string name="see_context">See Context</string>
 
 
